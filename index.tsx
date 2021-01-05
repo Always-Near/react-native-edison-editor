@@ -1,0 +1,107 @@
+import React, { Component } from "react";
+import { ViewStyle, Platform, requireNativeComponent } from "react-native";
+import {
+  StyleType,
+  BlockType,
+  CustomBlockType,
+  BlockProps,
+} from "edison-editor";
+
+const EdoEditor = requireNativeComponent<{ style: any }>("EdoEditor");
+export type StyleEnum = StyleType;
+export type BlockTypeEnum = BlockType;
+
+type PropTypes = {
+  style?: ViewStyle;
+  defaultValue?: string;
+  placeholder?: string;
+  onEditorReady?: () => void;
+  onStyleChanged?: (styles: StyleEnum[]) => void;
+  onBlockTypeChanged?: (type: BlockTypeEnum) => void;
+};
+
+class RNDraftView extends Component<PropTypes> {
+  // private webViewRef = React.createRef<WebView>();
+
+  // state = {
+  //   editorState: "",
+  // };
+
+  // private executeScript = (functionName: string, parameter?: string) => {
+  //   if (this.webViewRef.current) {
+  //     this.webViewRef.current.injectJavaScript(
+  //       `window.${functionName}(${parameter ? `'${parameter}'` : ""});true;`
+  //     );
+  //   }
+  // };
+
+  // private onMessage = (event: WebViewMessageEvent) => {
+  //   const { onStyleChanged, onBlockTypeChanged } = this.props;
+  //   const { data } = event.nativeEvent;
+  //   const { blockType, styles, editorState, isMounted } = JSON.parse(data);
+  //   if (onStyleChanged) {
+  //     onStyleChanged(styles ? styles.split(",") : []);
+  //   }
+  //   if (blockType) {
+  //     onBlockTypeChanged(blockType);
+  //   }
+  //   if (editorState) {
+  //     this.setState({ editorState: editorState.replace(/(\r\n|\n|\r)/gm, "") });
+  //   }
+  //   if (isMounted) {
+  //     this.widgetMounted();
+  //   }
+  // };
+
+  // private widgetMounted = () => {
+  //   const {
+  //     placeholder,
+  //     defaultValue,
+  //     onEditorReady = () => null,
+  //   } = this.props;
+  //   if (defaultValue) {
+  //     this.executeScript("setDefaultValue", defaultValue);
+  //   }
+  //   if (placeholder) {
+  //     this.executeScript("setEditorPlaceholder", placeholder);
+  //   }
+  //   onEditorReady();
+  // };
+
+  // private onAddBlock = <T extends CustomBlockType>(
+  //   type: T,
+  //   params: BlockProps<T>
+  // ) => {
+  //   this.executeScript("onAddBlock", JSON.stringify({ type, params }));
+  // };
+
+  // focus = () => {
+  //   this.executeScript("focusTextEditor");
+  // };
+
+  // blur = () => {
+  //   this.executeScript("blurTextEditor");
+  // };
+
+  // setBlockType = (blockType: BlockTypeEnum) => {
+  //   this.executeScript("toggleBlockType", blockType);
+  // };
+
+  // setStyle = (style: StyleEnum) => {
+  //   this.executeScript("toggleInlineStyle", style);
+  // };
+
+  // addImage = (src: string) => {
+  //   this.onAddBlock("image", { src });
+  // };
+
+  // getEditorState = () => {
+  //   return this.state.editorState;
+  // };
+
+  render() {
+    return <EdoEditor style={{ flex: 1 }} />;
+  }
+}
+
+export default RNDraftView;
