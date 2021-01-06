@@ -1,4 +1,7 @@
-draftjs-web/
+draft-js/
 index.tsx
-.DS_Store
+README.md
 tsconfig.json
+webpack.config.js
+yarn.lock
+.DS_Store

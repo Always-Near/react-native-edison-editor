@@ -1,6 +1,6 @@
 import React, { useState, createRef, useEffect } from "react";
 import { EditorState, RichUtils, getDefaultKeyBinding } from "draft-js";
-import EdisonEditor, { onAddBlock } from "edison-editor";
+import EdisonEditor, { onAddBlock } from "edison-editor-near";
 import { stateFromHTML } from "draft-js-import-html";
 import { stateToHTML } from "draft-js-export-html";
 
