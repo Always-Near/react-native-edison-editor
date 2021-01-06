@@ -1,13 +1,16 @@
 import React, { Component } from "react";
-import { ViewStyle, Platform } from "react-native";
+import { ViewStyle } from "react-native";
 import WebView, { WebViewMessageEvent } from "react-native-webview";
+import RNFS from "react-native-fs";
 import {
   StyleType,
   BlockType,
   CustomBlockType,
   BlockProps,
-} from "edison-editor-near";
-const draftJsHtml = require("./index.html");
+} from "edison-editor";
+import Package from "./package.json";
+
+import "./index.html";
 
 export type StyleEnum = StyleType;
 export type BlockTypeEnum = BlockType;
@@ -102,15 +105,12 @@ class RNDraftView extends Component<PropTypes> {
 
   render() {
     const { style = { flex: 1 } } = this.props;
+    const htmlPath = `file://${RNFS.MainBundlePath}/assets/node_modules/${Package.name}/index.html`;
     return (
       <WebView
         ref={this.webViewRef}
         style={style}
-        source={
-          Platform.OS === "ios"
-            ? draftJsHtml
-            : { uri: "file:///android_asset/index.html" }
-        }
+        source={{ uri: htmlPath }}
         keyboardDisplayRequiresUserAction={false}
         originWhitelist={["*"]}
         onMessage={this.onMessage}
