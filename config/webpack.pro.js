@@ -1,31 +1,10 @@
-const path = require("path");
+const config = require("./base.config");
+const { merge } = require("webpack-merge");
+const baseConfig = require("./webpack.base.js");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ScriptExtHtmlWebpackPlugin = require("script-ext-html-webpack-plugin");
-module.exports = {
+module.exports = merge(baseConfig, {
   mode: "production",
-  entry: {
-    main: path.join(__dirname, "draft-js/index.js"),
-  },
-  output: {
-    path: path.join(__dirname),
-  },
-  module: {
-    rules: [
-      {
-        test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
-        enforce: "pre",
-        use: [
-          {
-            loader: "babel-loader",
-            options: {
-              presets: ["@babel/preset-env", "@babel/preset-react"],
-            },
-          },
-        ],
-      },
-    ],
-  },
   plugins: [
     new HtmlWebpackPlugin({
       minify: {
@@ -44,11 +23,11 @@ module.exports = {
         minifyCSS: true,
         minifyURLs: true,
       },
-      template: path.join(__dirname, "draft-js/index.html"),
+      template: config.templatePath,
       showErrors: true,
     }),
     new ScriptExtHtmlWebpackPlugin({
       inline: ".js",
     }),
   ],
-};
+});

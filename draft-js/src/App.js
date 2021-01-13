@@ -3,6 +3,7 @@ import { EditorState, RichUtils, getDefaultKeyBinding } from "draft-js";
 import EdisonEditor, { onAddBlock } from "edison-editor";
 import { stateFromHTML } from "draft-js-import-html";
 import { stateToHTML } from "draft-js-export-html";
+import Header from "./header";
 
 function App() {
   const _draftEditorRef = createRef();
@@ -110,6 +111,7 @@ function App() {
       <style>
         {`.public-DraftEditorPlaceholder-root{position: absolute;color: silver;pointer-events: none;z-index: -10000;}`}
       </style>
+      <Header />
       <EdisonEditor
         ref={_draftEditorRef}
         editorState={editorState}

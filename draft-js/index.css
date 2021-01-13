@@ -1,0 +1,87 @@
+html,
+body,
+pre,
+xmp {
+  margin: 0 !important;
+  border: 0 !important;
+  width: initial !important;
+  -webkit-text-size-adjust: none;
+  font: -apple-system-body;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  -webkit-nbsp-mode: space !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+#root {
+  font-size: 17px;
+  color: inherit !important;
+  background-color: inherit !important;
+  background: inherit !important;
+  text-align: inherit !important;
+}
+#root br {
+  display: inherit;
+}
+#root pre br,
+#root xmp br {
+  display: none;
+}
+#root div#edo-container {
+  min-height: 300px;
+  caret-color: #0097ff;
+  letter-spacing: 0.1;
+}
+#root div#edo-message,
+#root div#edo-meta {
+  width: -webkit-calc(100vw - 30px);
+}
+#root img.edo-image,
+img.fullwidth {
+  padding: 10px 2px;
+  max-width: -webkit-calc(100vw - 30px);
+  height: auto;
+}
+#root a {
+  color: #1f9aff;
+}
+.edo-transform {
+  transform-origin-x: 0px;
+  transform-origin-y: 0px;
+}
+.x-apple-signature {
+  margin-top: 15px;
+}
+* {
+  outline: 0px solid transparent;
+}
+
+.template-variable {
+  width: auto;
+  display: inline-block !important;
+  display: inline;
+  padding: 2px 6px 2px 6px;
+  margin: 1px 3px 1px 3px;
+  border-radius: 5px;
+  background-color: #0097ff;
+  color: white;
+  outline: 0px solid transparent;
+  font-family: UICTFontTextStyleBody;
+}
+
+.template-variable_focus {
+  background-color: white;
+  color: #4093f5;
+  box-shadow: 0 0 0 1pt #0097ff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .template-variable_focus {
+    background-color: #111112;
+  }
+}

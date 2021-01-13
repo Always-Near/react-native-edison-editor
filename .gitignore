@@ -2,5 +2,5 @@ node_modules/
 /index.html
 /index.d.ts
 /index.js
-package-lock.json
+/package-lock.json
 .DS_Store
