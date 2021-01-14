@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ScriptExtHtmlWebpackPlugin = require("script-ext-html-webpack-plugin");
 module.exports = merge(baseConfig, {
   mode: "production",
+  devtool: "cheap-module-source-map",
   plugins: [
     new HtmlWebpackPlugin({
       minify: {

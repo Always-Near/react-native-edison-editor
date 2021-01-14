@@ -1,0 +1,71 @@
+#root > .compose-header {
+  padding-bottom: 12px;
+  border-bottom: 2px solid #ebebeb;
+
+  .header-item-box {
+    width: 100%;
+    display: flex;
+    box-sizing: border-box;
+    padding: 3px 20px;
+    line-height: 32px;
+    font-size: 12px;
+
+    .header-item-title {
+      margin: 0 16px 0 8px;
+      color: #666666;
+      flex: 0;
+    }
+
+    .header-item-content {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+
+      .tokenizing-text-contact-item {
+        line-height: 24px;
+        padding: 0 8px;
+        margin: 4px;
+        border-radius: 30px;
+        color: #0097ff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16);
+
+        &.invalid {
+          color: #ff485f;
+        }
+
+        &.selected {
+          background: #0097ff;
+          color: #fff;
+        }
+
+        &.invalid.selected {
+          background: #ff485f;
+          color: #fff;
+        }
+      }
+
+      .tokenizing-text-input {
+        min-width: 20px;
+        margin: 0;
+        padding: 0;
+        flex: 1;
+        border: none;
+        outline: none;
+      }
+    }
+
+    .header-item-icon {
+      flex: 0;
+      .compose-header-ccbcc-icon {
+        font-size: 10px;
+        line-height: 18px;
+        padding: 0 8px;
+        margin: 6px 0;
+        border-radius: 30px;
+        color: #666;
+        border: 1px solid #ebebeb;
+        white-space: nowrap;
+      }
+    }
+  }
+}

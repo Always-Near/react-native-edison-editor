@@ -14,14 +14,27 @@ import "./index.html";
 
 export type StyleEnum = StyleType;
 export type BlockTypeEnum = BlockType;
+export interface Contact {
+  name: string;
+  email: string;
+}
 
 type PropTypes = {
   style?: ViewStyle;
   defaultValue?: string;
   placeholder?: string;
+  to?: Contact[];
+  cc?: Contact[];
+  bcc?: Contact[];
+  from: Contact;
+  subject?: string;
   onEditorReady?: () => void;
   onStyleChanged?: (styles: StyleEnum[]) => void;
   onBlockTypeChanged?: (type: BlockTypeEnum) => void;
+  onToChange: (constactList: Contact[]) => void;
+  onCcChange: (constactList: Contact[]) => void;
+  onBccChange: (constactList: Contact[]) => void;
+  onSubjectChange: (subject: string) => void;
 };
 
 class RNDraftView extends Component<PropTypes> {
@@ -40,20 +53,31 @@ class RNDraftView extends Component<PropTypes> {
   };
 
   private onMessage = (event: WebViewMessageEvent) => {
-    const { onStyleChanged, onBlockTypeChanged } = this.props;
-    const { data } = event.nativeEvent;
-    const { blockType, styles, editorState, isMounted } = JSON.parse(data);
-    if (onStyleChanged) {
-      onStyleChanged(styles ? styles.split(",") : []);
-    }
-    if (blockType) {
-      onBlockTypeChanged(blockType);
-    }
-    if (editorState) {
-      this.setState({ editorState: editorState.replace(/(\r\n|\n|\r)/gm, "") });
-    }
-    if (isMounted) {
+    const { onToChange, onCcChange, onBccChange, onSubjectChange } = this.props;
+    const { type, data } = JSON.parse(event.nativeEvent.data);
+    if (type === "isMounted") {
       this.widgetMounted();
+      return;
+    }
+    if (type === "editorChange") {
+      this.setState({ editorState: data.replace(/(\r\n|\n|\r)/gm, "") });
+      return;
+    }
+    if (type === "toChange") {
+      onToChange(data);
+      return;
+    }
+    if (type === "ccChange") {
+      onCcChange(data);
+      return;
+    }
+    if (type === "bccChange") {
+      onBccChange(data);
+      return;
+    }
+    if (type === "subjectChange") {
+      onSubjectChange(data);
+      return;
     }
   };
 
@@ -61,6 +85,11 @@ class RNDraftView extends Component<PropTypes> {
     const {
       placeholder,
       defaultValue,
+      to,
+      cc,
+      bcc,
+      from,
+      subject,
       onEditorReady = () => null,
     } = this.props;
     if (defaultValue) {
@@ -68,6 +97,19 @@ class RNDraftView extends Component<PropTypes> {
     }
     if (placeholder) {
       this.executeScript("setEditorPlaceholder", placeholder);
+    }
+    if (to) {
+      this.executeScript("setDefaultTo", JSON.stringify(to));
+    }
+    if (cc) {
+      this.executeScript("setDefaultCc", JSON.stringify(cc));
+    }
+    if (bcc) {
+      this.executeScript("setDefaultBcc", JSON.stringify(bcc));
+    }
+    this.executeScript("setDefaultFrom", JSON.stringify(from));
+    if (subject) {
+      this.executeScript("setDefaultSubject", subject);
     }
     onEditorReady();
   };

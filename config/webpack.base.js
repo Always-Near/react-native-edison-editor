@@ -8,12 +8,12 @@ module.exports = {
     path: config.appPath,
   },
   resolve: {
-    extensions: [".js", ".json", ".jsx", ".ts", ".tsx"],
+    extensions: [".js", ".json", ".jsx", ".ts", ".tsx", ".less"],
   },
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.((j|t)sx?)$/,
         exclude: /node_modules/,
         use: [
           {
@@ -23,6 +23,13 @@ module.exports = {
               plugins: ["@babel/plugin-proposal-class-properties"],
             },
           },
+          {
+            loader: "awesome-typescript-loader",
+            options: {
+              silent: true,
+              configFileName: config.tsConfigPath,
+            },
+          },
         ],
       },
       {
@@ -30,6 +37,10 @@ module.exports = {
         include: config.srcPath,
         exclude: /node_modules/,
         use: ["style-loader", "css-loader"],
+      },
+      {
+        test: /\.less$/,
+        use: ["style-loader", "css-loader", "less-loader"],
       },
     ],
   },

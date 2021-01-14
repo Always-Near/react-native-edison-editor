@@ -12,12 +12,6 @@ xmp {
   -webkit-nbsp-mode: space !important;
   -webkit-tap-highlight-color: transparent !important;
 }
-html,
-body {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-}
 #root {
   font-size: 17px;
   color: inherit !important;

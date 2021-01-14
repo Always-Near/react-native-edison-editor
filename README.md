@@ -4,7 +4,7 @@
 
 ---
 
-### if you want change the `index.html`:
+### if you want change the `index.html`(webview content):
 
 #### 1. install the dependencies
 
@@ -38,7 +38,7 @@ var htmlPath = "http://localhost:8080/"
 
 ---
 
-### if you want change the `index.js` or `index.d.ts`:
+### if you want change the `index.js` or `index.d.ts`(webview shell):
 
 #### 1. copy the `index.tsx` to node_modules in you project
 

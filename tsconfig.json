@@ -15,7 +15,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react",
-    "declaration": true
+    "declaration": true,
+    "preserveConstEnums": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "downlevelIteration": true,
+    "strict": true,
+    "noEmit": false
   },
   "include": ["index.tsx"]
 }
