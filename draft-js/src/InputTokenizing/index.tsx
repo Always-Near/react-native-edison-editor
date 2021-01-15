@@ -27,6 +27,7 @@ type State = {
 
 export default class Tokenizing extends React.Component<Props, State> {
   _inputRef: React.RefObject<HTMLInputElement>;
+  blurSetTimeout: number | undefined;
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -70,6 +71,12 @@ export default class Tokenizing extends React.Component<Props, State> {
     if (contactList.some((c) => c.email === contact.email)) {
       return;
     }
+    this.setState({
+      inputValue: "",
+    });
+    if (this._inputRef.current) {
+      this._inputRef.current.focus();
+    }
     const newContactList = [
       ...contactList,
       {
@@ -77,9 +84,6 @@ export default class Tokenizing extends React.Component<Props, State> {
         email: contact.email,
       },
     ];
-    this.setState({
-      inputValue: "",
-    });
     if (this.props.onContactChange) {
       this.props.onContactChange(newContactList);
     }
@@ -99,7 +103,7 @@ export default class Tokenizing extends React.Component<Props, State> {
     this.setState({
       selectedEmail: "",
     });
-    setTimeout(() => {
+    this.blurSetTimeout = setTimeout(() => {
       this.setState({
         focused: false,
       });
@@ -107,6 +111,9 @@ export default class Tokenizing extends React.Component<Props, State> {
   };
 
   private _onInputFocus = () => {
+    if (this.blurSetTimeout) {
+      clearTimeout(this.blurSetTimeout);
+    }
     this.setState({
       focused: true,
     });
@@ -147,10 +154,18 @@ export default class Tokenizing extends React.Component<Props, State> {
     if (readOnly) {
       return false;
     }
-    if (!suggestions || !suggestions.length) {
+    if (!suggestions || !this.filterSuggestions().length) {
       return false;
     }
     return true;
+  };
+
+  private filterSuggestions = () => {
+    const { contactList, suggestions = [] } = this.props;
+    const filter = suggestions.filter((sug) =>
+      contactList.every((c) => c.email !== sug.email)
+    );
+    return filter;
   };
 
   private _renderContactItem = (contact: Contact) => {
@@ -194,7 +209,7 @@ export default class Tokenizing extends React.Component<Props, State> {
 
   render() {
     const { inputValue } = this.state;
-    const { title, contactList, readOnly, icon, suggestions } = this.props;
+    const { title, contactList, readOnly, icon } = this.props;
     return (
       <div className="header-item-box">
         <div className="header-item-title">{title}</div>
@@ -215,7 +230,7 @@ export default class Tokenizing extends React.Component<Props, State> {
         {icon ? <div className="header-item-icon">{icon}</div> : null}
         {this.shouldShowSuggestions() ? (
           <div className="header-item-suggestions">
-            {suggestions?.map((sug) => this._renderSuggestion(sug))}
+            {this.filterSuggestions().map((sug) => this._renderSuggestion(sug))}
           </div>
         ) : null}
       </div>
