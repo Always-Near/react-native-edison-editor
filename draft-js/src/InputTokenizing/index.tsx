@@ -99,10 +99,12 @@ export default class Tokenizing extends React.Component<Props, State> {
   };
 
   private _onInputBlur = () => {
-    this._onSubmitInput();
-    this.setState({
-      selectedEmail: "",
-    });
+    setTimeout(() => {
+      this._onSubmitInput();
+      this.setState({
+        inputValue: "",
+      });
+    }, 100);
     this.blurSetTimeout = setTimeout(() => {
       this.setState({
         focused: false,
@@ -147,7 +149,7 @@ export default class Tokenizing extends React.Component<Props, State> {
 
   private shouldShowSuggestions = () => {
     const { focused, inputValue } = this.state;
-    if (!focused || inputValue) {
+    if (!focused || !inputValue) {
       return false;
     }
     const { readOnly, suggestions } = this.props;
