@@ -26,15 +26,16 @@ type PropTypes = {
   to?: Contact[];
   cc?: Contact[];
   bcc?: Contact[];
-  from: Contact;
+  from?: Contact;
   subject?: string;
+  showHeader?: boolean;
   onEditorReady?: () => void;
   onStyleChanged?: (styles: StyleEnum[]) => void;
   onBlockTypeChanged?: (type: BlockTypeEnum) => void;
-  onToChange: (constactList: Contact[]) => void;
-  onCcChange: (constactList: Contact[]) => void;
-  onBccChange: (constactList: Contact[]) => void;
-  onSubjectChange: (subject: string) => void;
+  onToChange?: (constactList: Contact[]) => void;
+  onCcChange?: (constactList: Contact[]) => void;
+  onBccChange?: (constactList: Contact[]) => void;
+  onSubjectChange?: (subject: string) => void;
 };
 
 class RNDraftView extends Component<PropTypes> {
@@ -63,19 +64,19 @@ class RNDraftView extends Component<PropTypes> {
       this.setState({ editorState: data.replace(/(\r\n|\n|\r)/gm, "") });
       return;
     }
-    if (type === "toChange") {
+    if (type === "toChange" && onToChange) {
       onToChange(data);
       return;
     }
-    if (type === "ccChange") {
+    if (type === "ccChange" && onCcChange) {
       onCcChange(data);
       return;
     }
-    if (type === "bccChange") {
+    if (type === "bccChange" && onBccChange) {
       onBccChange(data);
       return;
     }
-    if (type === "subjectChange") {
+    if (type === "subjectChange" && onSubjectChange) {
       onSubjectChange(data);
       return;
     }
@@ -90,8 +91,12 @@ class RNDraftView extends Component<PropTypes> {
       bcc,
       from,
       subject,
+      showHeader = false,
       onEditorReady = () => null,
     } = this.props;
+
+    this.executeScript("setHeaderVisible", showHeader.toString());
+
     if (defaultValue) {
       this.executeScript("setDefaultValue", defaultValue);
     }
@@ -107,7 +112,9 @@ class RNDraftView extends Component<PropTypes> {
     if (bcc) {
       this.executeScript("setDefaultBcc", JSON.stringify(bcc));
     }
-    this.executeScript("setDefaultFrom", JSON.stringify(from));
+    if (from) {
+      this.executeScript("setDefaultFrom", JSON.stringify(from));
+    }
     if (subject) {
       this.executeScript("setDefaultSubject", subject);
     }

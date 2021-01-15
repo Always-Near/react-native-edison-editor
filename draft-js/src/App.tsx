@@ -8,6 +8,7 @@ import "./styles";
 
 type State = {
   editorState: EditorState;
+  headerVisible: boolean;
   placeholder: string;
   to: Contact[];
   cc: Contact[];
@@ -22,6 +23,7 @@ class App extends React.Component<any, State> {
     super(props);
     this.state = {
       editorState: EditorState.createEmpty(),
+      headerVisible: false,
       placeholder: "",
       to: [],
       cc: [],
@@ -36,6 +38,7 @@ class App extends React.Component<any, State> {
     this.postMessage("isMounted", true);
     window.toggleBlockType = this.toggleBlockType;
     window.toggleInlineStyle = this.toggleInlineStyle;
+    window.setHeaderVisible = this.setHeaderVisible;
     window.setDefaultValue = this.setDefaultValue;
     window.setEditorPlaceholder = this.setEditorPlaceholder;
     window.setDefaultTo = this.setDefaultTo;
@@ -121,6 +124,10 @@ class App extends React.Component<any, State> {
     this.setEditorState(RichUtils.toggleInlineStyle(editorState, inlineStyle));
   };
 
+  private setHeaderVisible = (headerVisible: string) => {
+    this.setState({ headerVisible: headerVisible === true.toString() });
+  };
+
   private setDefaultValue = (html: string) => {
     try {
       if (html) {
@@ -195,24 +202,35 @@ class App extends React.Component<any, State> {
   };
 
   render() {
-    const { to, cc, bcc, from, subject, placeholder, editorState } = this.state;
+    const {
+      headerVisible,
+      to,
+      cc,
+      bcc,
+      from,
+      subject,
+      placeholder,
+      editorState,
+    } = this.state;
 
     return (
       <>
         <style>
           {`.public-DraftEditorPlaceholder-root{position: absolute;color: silver;pointer-events: none;z-index: -10000;}`}
         </style>
-        <Header
-          to={to}
-          cc={cc}
-          bcc={bcc}
-          from={from}
-          subject={subject}
-          onToChange={(contact) => this.onContactChange("to", contact)}
-          onCcChange={(contact) => this.onContactChange("cc", contact)}
-          onBccChange={(contact) => this.onContactChange("bcc", contact)}
-          onSubjectChange={this.onSubjectChange}
-        />
+        {headerVisible ? (
+          <Header
+            to={to}
+            cc={cc}
+            bcc={bcc}
+            from={from}
+            subject={subject}
+            onToChange={(contact) => this.onContactChange("to", contact)}
+            onCcChange={(contact) => this.onContactChange("cc", contact)}
+            onBccChange={(contact) => this.onContactChange("bcc", contact)}
+            onSubjectChange={this.onSubjectChange}
+          />
+        ) : null}
         <div className={"compose-editor"}>
           <EdisonEditor
             ref={this._draftEditorRef}

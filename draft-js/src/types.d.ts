@@ -2,6 +2,7 @@ declare interface Window {
   ReactNativeWebView: any;
   toggleBlockType: (blockType: string) => void;
   toggleInlineStyle: (inlineStyle: string) => void;
+  setHeaderVisible: (headerVisible: string) => void;
   setDefaultValue: (html: string) => void;
   setEditorPlaceholder: (placeholder: string) => void;
   setDefaultTo: (contactList: string) => void;
