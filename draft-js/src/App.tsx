@@ -74,7 +74,7 @@ class App extends React.Component<any, State> {
   private handleKeyCommand = (command: string, editorState: EditorState) => {
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
-      this.setEditorState(editorState);
+      this.setEditorState(newState);
       return "handled";
     }
     return "not-handled";
