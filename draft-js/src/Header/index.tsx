@@ -8,6 +8,8 @@ type Props = {
   bcc: Contact[];
   from: Contact[];
   subject: string;
+  suggestions?: ContactWithAvatar[];
+  onSugTextChange: (text: string) => void;
   onToChange: (contactList: Contact[]) => void;
   onCcChange: (contactList: Contact[]) => void;
   onBccChange: (contactList: Contact[]) => void;
@@ -20,10 +22,12 @@ export default function Header({
   bcc,
   from,
   subject,
+  suggestions,
   onToChange,
   onCcChange,
   onBccChange,
   onSubjectChange,
+  onSugTextChange,
 }: Props) {
   const [ccBccVisible, setCcBccVisible] = useState(false);
   const showCcBcc = ccBccVisible || cc.length || bcc.length;
@@ -44,20 +48,26 @@ export default function Header({
       <Tokenizing
         title="To:"
         contactList={to}
+        onSugTextChange={onSugTextChange}
         onContactChange={onToChange}
         icon={showCcBcc ? null : renderCcBccIcon()}
+        suggestions={suggestions}
       />
       {showCcBcc ? (
         <>
           <Tokenizing
             title="Cc:"
             contactList={cc}
+            onSugTextChange={onSugTextChange}
             onContactChange={onCcChange}
+            suggestions={suggestions}
           />
           <Tokenizing
             title="Bcc:"
             contactList={bcc}
+            onSugTextChange={onSugTextChange}
             onContactChange={onBccChange}
+            suggestions={suggestions}
           />
         </>
       ) : null}

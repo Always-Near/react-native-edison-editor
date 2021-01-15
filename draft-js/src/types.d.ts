@@ -10,6 +10,7 @@ declare interface Window {
   setDefaultBcc: (contactList: string) => void;
   setDefaultFrom: (contact: string) => void;
   setDefaultSubject: (subject: string) => void;
+  setSuggestions: (contactList: string) => void;
   onAddBlock: (paramsStr: string) => void;
   focusTextEditor: () => void;
   blurTextEditor: () => void;
@@ -18,4 +19,10 @@ declare interface Window {
 interface Contact {
   name: string;
   email: string;
+}
+
+interface ContactWithAvatar {
+  name: string;
+  email: string;
+  avatar: string;
 }

@@ -15,6 +15,7 @@ type State = {
   bcc: Contact[];
   from: Contact[];
   subject: string;
+  suggestions: ContactWithAvatar[];
 };
 
 class App extends React.Component<any, State> {
@@ -30,6 +31,7 @@ class App extends React.Component<any, State> {
       bcc: [],
       from: [],
       subject: "",
+      suggestions: [],
     };
     this._draftEditorRef = createRef<Editor>();
   }
@@ -49,6 +51,7 @@ class App extends React.Component<any, State> {
     window.onAddBlock = this.onAddBlockEntity;
     window.focusTextEditor = this.focusTextEditor;
     window.blurTextEditor = this.blurTextEditor;
+    window.setSuggestions = this.setSuggestions;
   }
 
   private postMessage = (type: string, data: any) => {
@@ -110,6 +113,10 @@ class App extends React.Component<any, State> {
   private onSubjectChange = (str: string) => {
     this.setState({ subject: str });
     this.postMessage("subjectChange", str);
+  };
+
+  private onSugTextChange = (str: string) => {
+    this.postMessage("sugTextChange", str);
   };
 
   // publish functions
@@ -182,6 +189,15 @@ class App extends React.Component<any, State> {
     this.setState({ placeholder });
   };
 
+  private setSuggestions = (contacts: string) => {
+    try {
+      const suggestions = JSON.parse(contacts) as ContactWithAvatar[];
+      this.setState({ suggestions });
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
   private onAddBlockEntity = (paramsStr: string) => {
     const { editorState } = this.state;
     try {
@@ -211,6 +227,7 @@ class App extends React.Component<any, State> {
       subject,
       placeholder,
       editorState,
+      suggestions,
     } = this.state;
 
     return (
@@ -229,6 +246,8 @@ class App extends React.Component<any, State> {
             onCcChange={(contact) => this.onContactChange("cc", contact)}
             onBccChange={(contact) => this.onContactChange("bcc", contact)}
             onSubjectChange={this.onSubjectChange}
+            onSugTextChange={this.onSugTextChange}
+            suggestions={suggestions}
           />
         ) : null}
         <div className={"compose-editor"}>

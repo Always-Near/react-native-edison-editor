@@ -14,12 +14,15 @@ type Props = {
   title: string;
   readOnly?: boolean;
   contactList: Contact[];
+  onSugTextChange?: (text: string) => void;
   onContactChange?: (contactList: Contact[]) => void;
   icon?: React.ReactNode;
+  suggestions?: ContactWithAvatar[];
 };
 type State = {
   selectedEmail: string;
   inputValue: string;
+  focused: boolean;
 };
 
 export default class Tokenizing extends React.Component<Props, State> {
@@ -29,12 +32,16 @@ export default class Tokenizing extends React.Component<Props, State> {
     this.state = {
       selectedEmail: "",
       inputValue: "",
+      focused: false,
     };
     this._inputRef = React.createRef<HTMLInputElement>();
   }
 
   private _onChangeInput = (str: string) => {
     this.setState({ inputValue: str });
+    if (this.props.onSugTextChange) {
+      this.props.onSugTextChange(str);
+    }
   };
 
   private _onSubmitInput = () => {
@@ -58,6 +65,26 @@ export default class Tokenizing extends React.Component<Props, State> {
     }
   };
 
+  private selectSugContact = (contact: ContactWithAvatar) => {
+    const { contactList } = this.props;
+    if (contactList.some((c) => c.email === contact.email)) {
+      return;
+    }
+    const newContactList = [
+      ...contactList,
+      {
+        name: contact.name,
+        email: contact.email,
+      },
+    ];
+    this.setState({
+      inputValue: "",
+    });
+    if (this.props.onContactChange) {
+      this.props.onContactChange(newContactList);
+    }
+  };
+
   private _onInputKeyPress = (event: React.KeyboardEvent) => {
     if (event.key === "Backspace" && !this.state.inputValue) {
       this._deleteSelectContact();
@@ -71,6 +98,17 @@ export default class Tokenizing extends React.Component<Props, State> {
     this._onSubmitInput();
     this.setState({
       selectedEmail: "",
+    });
+    setTimeout(() => {
+      this.setState({
+        focused: false,
+      });
+    }, 100);
+  };
+
+  private _onInputFocus = () => {
+    this.setState({
+      focused: true,
     });
   };
 
@@ -100,6 +138,21 @@ export default class Tokenizing extends React.Component<Props, State> {
     }
   };
 
+  private shouldShowSuggestions = () => {
+    const { focused, inputValue } = this.state;
+    if (!focused || inputValue) {
+      return false;
+    }
+    const { readOnly, suggestions } = this.props;
+    if (readOnly) {
+      return false;
+    }
+    if (!suggestions || !suggestions.length) {
+      return false;
+    }
+    return true;
+  };
+
   private _renderContactItem = (contact: Contact) => {
     const { selectedEmail } = this.state;
     const isSelected = selectedEmail === contact.email;
@@ -117,9 +170,31 @@ export default class Tokenizing extends React.Component<Props, State> {
     );
   };
 
+  private _renderSuggestion = (contact: ContactWithAvatar) => {
+    return (
+      <div
+        key={contact.email}
+        className="suggestion-item"
+        onClick={() => this.selectSugContact(contact)}
+      >
+        <div className="suggestion-item-header">
+          {contact.avatar ? (
+            <img src={contact.avatar} alt={contact.name} />
+          ) : (
+            (contact.name || contact.email).slice(0, 1).toUpperCase()
+          )}
+        </div>
+        <div className="suggestion-item-content">
+          <div className="suggestion-item-name">{contact.name}</div>
+          <div className="suggestion-item-email">{contact.email}</div>
+        </div>
+      </div>
+    );
+  };
+
   render() {
     const { inputValue } = this.state;
-    const { title, contactList, readOnly, icon } = this.props;
+    const { title, contactList, readOnly, icon, suggestions } = this.props;
     return (
       <div className="header-item-box">
         <div className="header-item-title">{title}</div>
@@ -132,11 +207,17 @@ export default class Tokenizing extends React.Component<Props, State> {
               ref={this._inputRef}
               onChange={(e) => this._onChangeInput(e.target.value)}
               onBlur={this._onInputBlur}
+              onFocus={this._onInputFocus}
               onKeyDown={(e) => this._onInputKeyPress(e)}
             />
           )}
         </div>
         {icon ? <div className="header-item-icon">{icon}</div> : null}
+        {this.shouldShowSuggestions() ? (
+          <div className="header-item-suggestions">
+            {suggestions?.map((sug) => this._renderSuggestion(sug))}
+          </div>
+        ) : null}
       </div>
     );
   }

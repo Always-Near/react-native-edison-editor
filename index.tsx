@@ -19,6 +19,12 @@ export interface Contact {
   email: string;
 }
 
+export interface ContactWithAvatar {
+  name: string;
+  email: string;
+  avatar: string;
+}
+
 type PropTypes = {
   style?: ViewStyle;
   defaultValue?: string;
@@ -29,6 +35,7 @@ type PropTypes = {
   from?: Contact;
   subject?: string;
   showHeader?: boolean;
+  suggestions?: ContactWithAvatar[];
   onEditorReady?: () => void;
   onStyleChanged?: (styles: StyleEnum[]) => void;
   onBlockTypeChanged?: (type: BlockTypeEnum) => void;
@@ -36,6 +43,7 @@ type PropTypes = {
   onCcChange?: (constactList: Contact[]) => void;
   onBccChange?: (constactList: Contact[]) => void;
   onSubjectChange?: (subject: string) => void;
+  onSugTextChange?: (subject: string) => void;
 };
 
 class RNDraftView extends Component<PropTypes> {
@@ -44,6 +52,25 @@ class RNDraftView extends Component<PropTypes> {
   state = {
     editorState: "",
   };
+
+  checkSuggestionChange = (suggestions?: ContactWithAvatar[]) => {
+    if (!suggestions) {
+      return "";
+    }
+    return suggestions.reduce((pre, s) => pre + s.email, "");
+  };
+
+  UNSAFE_componentWillReceiveProps(next: PropTypes) {
+    if (
+      this.checkSuggestionChange(next.suggestions) !==
+      this.checkSuggestionChange(this.props.suggestions)
+    ) {
+      this.executeScript(
+        "setSuggestions",
+        JSON.stringify(next.suggestions || [])
+      );
+    }
+  }
 
   private executeScript = (functionName: string, parameter?: string) => {
     if (this.webViewRef.current) {
@@ -54,7 +81,13 @@ class RNDraftView extends Component<PropTypes> {
   };
 
   private onMessage = (event: WebViewMessageEvent) => {
-    const { onToChange, onCcChange, onBccChange, onSubjectChange } = this.props;
+    const {
+      onToChange,
+      onCcChange,
+      onBccChange,
+      onSubjectChange,
+      onSugTextChange,
+    } = this.props;
     const { type, data } = JSON.parse(event.nativeEvent.data);
     if (type === "isMounted") {
       this.widgetMounted();
@@ -79,6 +112,9 @@ class RNDraftView extends Component<PropTypes> {
     if (type === "subjectChange" && onSubjectChange) {
       onSubjectChange(data);
       return;
+    }
+    if (type === "sugTextChange" && onSugTextChange) {
+      onSugTextChange(data);
     }
   };
 

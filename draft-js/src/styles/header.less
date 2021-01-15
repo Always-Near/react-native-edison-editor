@@ -9,6 +9,7 @@
     padding: 3px 20px;
     line-height: 32px;
     font-size: 12px;
+    position: relative;
 
     .header-item-title {
       margin: 0 16px 0 8px;
@@ -65,6 +66,57 @@
         color: #666;
         border: 1px solid #ebebeb;
         white-space: nowrap;
+      }
+    }
+
+    .header-item-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      padding: 16px 0;
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 10;
+
+      .suggestion-item {
+        height: 72px;
+        padding: 0 20px;
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        .suggestion-item-header {
+          height: 40px;
+          width: 40px;
+          flex: 0 0 auto;
+          line-height: 40px;
+          text-align: center;
+          margin-right: 16px;
+        }
+        .suggestion-item-content {
+          height: 40px;
+          overflow: hidden;
+
+          .suggestion-item-name {
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 19px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          .suggestion-item-email {
+            line-height: 16px;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
       }
     }
   }
