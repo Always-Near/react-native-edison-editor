@@ -1,8 +1,15 @@
 import React, { createRef } from "react";
-import { Editor, EditorState, RichUtils, getDefaultKeyBinding } from "draft-js";
+import {
+  Editor,
+  EditorState,
+  ContentState,
+  RichUtils,
+  getDefaultKeyBinding,
+  convertFromHTML,
+} from "draft-js";
 import EdisonEditor, { onAddBlock } from "edison-editor";
-import { stateFromHTML } from "draft-js-import-html";
 import { stateToHTML } from "draft-js-export-html";
+import { Buffer } from "buffer";
 import Header from "./Header";
 import "./styles";
 
@@ -138,7 +145,13 @@ class App extends React.Component<any, State> {
   private setDefaultValue = (html: string) => {
     try {
       if (html) {
-        this.setEditorState(EditorState.createWithContent(stateFromHTML(html)));
+        const formatHtml = Buffer.from(html, "base64").toString("utf-8");
+        const blocksFromHTML = convertFromHTML(formatHtml);
+        const state = ContentState.createFromBlockArray(
+          blocksFromHTML.contentBlocks,
+          blocksFromHTML.entityMap
+        );
+        this.setEditorState(EditorState.createWithContent(state));
       }
     } catch (e) {
       console.error(e);

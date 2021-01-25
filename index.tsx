@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { ViewStyle } from "react-native";
 import WebView, { WebViewMessageEvent } from "react-native-webview";
 import RNFS from "react-native-fs";
+import { Buffer } from "buffer";
 import {
   StyleType,
   BlockType,
@@ -96,7 +97,7 @@ class RNDraftView extends Component<PropTypes> {
       return;
     }
     if (type === "editorChange") {
-      onEditorChange&&onEditorChange(data);
+      onEditorChange && onEditorChange(data);
       this.setState({ editorState: data.replace(/(\r\n|\n|\r)/gm, "") });
       return;
     }
@@ -138,7 +139,8 @@ class RNDraftView extends Component<PropTypes> {
     this.executeScript("setHeaderVisible", showHeader.toString());
 
     if (defaultValue) {
-      this.executeScript("setDefaultValue", defaultValue);
+      const formatHtml = Buffer.from(defaultValue, "utf-8").toString("base64");
+      this.executeScript("setDefaultValue", formatHtml);
     }
     if (placeholder) {
       this.executeScript("setEditorPlaceholder", placeholder);
