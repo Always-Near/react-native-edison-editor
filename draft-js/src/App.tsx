@@ -7,7 +7,7 @@ import {
   getDefaultKeyBinding,
   convertFromHTML,
 } from "draft-js";
-import EdisonEditor, { onAddBlock } from "edison-editor";
+import EdisonEditor, { EdisonUtil } from "edison-editor";
 import { stateToHTML } from "draft-js-export-html";
 import { Buffer } from "buffer";
 import Header from "./Header";
@@ -47,6 +47,7 @@ class App extends React.Component<any, State> {
     this.postMessage("isMounted", true);
     window.toggleBlockType = this.toggleBlockType;
     window.toggleInlineStyle = this.toggleInlineStyle;
+    window.toggleSpecialType = this.toggleSpecialType;
     window.setHeaderVisible = this.setHeaderVisible;
     window.setDefaultValue = this.setDefaultValue;
     window.setEditorPlaceholder = this.setEditorPlaceholder;
@@ -55,7 +56,7 @@ class App extends React.Component<any, State> {
     window.setDefaultBcc = this.setDefaultBcc;
     window.setDefaultFrom = this.setDefaultFrom;
     window.setDefaultSubject = this.setDefaultSubject;
-    window.onAddBlock = this.onAddBlockEntity;
+    window.onAddAtomicBlock = this.onAddAtomicBlock;
     window.focusTextEditor = this.focusTextEditor;
     window.blurTextEditor = this.blurTextEditor;
     window.setSuggestions = this.setSuggestions;
@@ -77,6 +78,10 @@ class App extends React.Component<any, State> {
       this.postMessage(
         "editorChange",
         stateToHTML(this.state.editorState.getCurrentContent())
+      );
+      this.postMessage(
+        "activeStyleChange",
+        JSON.stringify(editorState.getCurrentInlineStyle().toArray())
       );
     });
   };
@@ -127,6 +132,22 @@ class App extends React.Component<any, State> {
   };
 
   // publish functions
+
+  private toggleSpecialType = (command: string) => {
+    const { editorState } = this.state;
+    if (command === "CLEAR") {
+      this.setEditorState(EdisonUtil.clearAllInlineStyle(editorState));
+      return;
+    }
+    if (command === "IndentIncrease") {
+      this.setEditorState(EdisonUtil.indentIncrease(editorState));
+      return;
+    }
+    if (command === "IndentDecrease") {
+      this.setEditorState(EdisonUtil.indentDecrease(editorState));
+      return;
+    }
+  };
 
   private toggleBlockType = (blockType: string) => {
     const { editorState } = this.state;
@@ -211,11 +232,11 @@ class App extends React.Component<any, State> {
     }
   };
 
-  private onAddBlockEntity = (paramsStr: string) => {
+  private onAddAtomicBlock = (paramsStr: string) => {
     const { editorState } = this.state;
     try {
       const { type, params } = JSON.parse(paramsStr);
-      const newState = onAddBlock(type, params, editorState);
+      const newState = EdisonUtil.onAddAtomicBlock(type, params, editorState);
       this.setEditorState(newState);
     } catch (err) {
       console.log(err.message);

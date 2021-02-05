@@ -4,17 +4,14 @@ import WebView, { WebViewMessageEvent } from "react-native-webview";
 import RNFS from "react-native-fs";
 import { Buffer } from "buffer";
 import {
-  StyleType,
-  BlockType,
-  CustomBlockType,
-  BlockProps,
+  AtomicBlockType,
+  AtomicBlockProps,
+  InlineStyleType,
 } from "edison-editor";
 import Package from "./package.json";
 
 import "./index.html";
 
-export type StyleEnum = StyleType;
-export type BlockTypeEnum = BlockType;
 export interface Contact {
   name: string;
   email: string;
@@ -38,8 +35,7 @@ type PropTypes = {
   showHeader?: boolean;
   suggestions?: ContactWithAvatar[];
   onEditorReady?: () => void;
-  onStyleChanged?: (styles: StyleEnum[]) => void;
-  onBlockTypeChanged?: (type: BlockTypeEnum) => void;
+  onActiveStyleChange?: (styles: string[]) => void;
   onToChange?: (constactList: Contact[]) => void;
   onCcChange?: (constactList: Contact[]) => void;
   onBccChange?: (constactList: Contact[]) => void;
@@ -90,6 +86,7 @@ class RNDraftView extends Component<PropTypes> {
       onSubjectChange,
       onSugTextChange,
       onEditorChange,
+      onActiveStyleChange,
     } = this.props;
     const { type, data } = JSON.parse(event.nativeEvent.data);
     if (type === "isMounted") {
@@ -97,9 +94,12 @@ class RNDraftView extends Component<PropTypes> {
       return;
     }
     if (type === "editorChange") {
-      onEditorChange && onEditorChange(data);
+      onEditorChange && onEditorChange(data.replace(/(\r\n|\n|\r)/gm, ""));
       this.setState({ editorState: data.replace(/(\r\n|\n|\r)/gm, "") });
       return;
+    }
+    if (type === "activeStyleChange") {
+      onActiveStyleChange && onActiveStyleChange(data);
     }
     if (type === "toChange" && onToChange) {
       onToChange(data);
@@ -163,11 +163,11 @@ class RNDraftView extends Component<PropTypes> {
     onEditorReady();
   };
 
-  private onAddBlock = <T extends CustomBlockType>(
+  private onAddAtomicBlock = <T extends AtomicBlockType>(
     type: T,
-    params: BlockProps<T>
+    params: AtomicBlockProps<T>
   ) => {
-    this.executeScript("onAddBlock", JSON.stringify({ type, params }));
+    this.executeScript("onAddAtomicBlock", JSON.stringify({ type, params }));
   };
 
   focus = () => {
@@ -178,16 +178,20 @@ class RNDraftView extends Component<PropTypes> {
     this.executeScript("blurTextEditor");
   };
 
-  setBlockType = (blockType: BlockTypeEnum) => {
-    this.executeScript("toggleBlockType", blockType);
-  };
-
-  setStyle = (style: StyleEnum) => {
+  setStyle = (style: InlineStyleType) => {
     this.executeScript("toggleInlineStyle", style);
   };
 
+  setBlockType = (blockType: "unordered-list-item" | "ordered-list-item") => {
+    this.executeScript("toggleBlockType", blockType);
+  };
+
+  setSpecialType = (command: "CLEAR" | "IndentIncrease" | "IndentDecrease") => {
+    this.executeScript("toggleSpecialType", command);
+  };
+
   addImage = (src: string) => {
-    this.onAddBlock("image", { src });
+    this.onAddAtomicBlock("image", { src });
   };
 
   getEditorState = () => {

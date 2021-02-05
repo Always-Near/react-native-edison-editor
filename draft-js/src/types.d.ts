@@ -2,6 +2,7 @@ declare interface Window {
   ReactNativeWebView: any;
   toggleBlockType: (blockType: string) => void;
   toggleInlineStyle: (inlineStyle: string) => void;
+  toggleSpecialType: (command: string) => void;
   setHeaderVisible: (headerVisible: string) => void;
   setDefaultValue: (html: string) => void;
   setEditorPlaceholder: (placeholder: string) => void;
@@ -11,7 +12,7 @@ declare interface Window {
   setDefaultFrom: (contact: string) => void;
   setDefaultSubject: (subject: string) => void;
   setSuggestions: (contactList: string) => void;
-  onAddBlock: (paramsStr: string) => void;
+  onAddAtomicBlock: (paramsStr: string) => void;
   focusTextEditor: () => void;
   blurTextEditor: () => void;
 }
