@@ -41,6 +41,8 @@ type PropTypes = {
   onBccChange?: (constactList: Contact[]) => void;
   onSubjectChange?: (subject: string) => void;
   onSugTextChange?: (subject: string) => void;
+  onSizeChange?: (size: number) => void;
+  editPosition?: (pos: number) => void;
   onEditorChange?: (content: string) => void;
 };
 
@@ -87,6 +89,8 @@ class RNDraftView extends Component<PropTypes> {
       onSugTextChange,
       onEditorChange,
       onActiveStyleChange,
+      editPosition,
+      onSizeChange,
     } = this.props;
     const { type, data } = JSON.parse(event.nativeEvent.data);
     if (type === "isMounted") {
@@ -119,6 +123,14 @@ class RNDraftView extends Component<PropTypes> {
     }
     if (type === "sugTextChange" && onSugTextChange) {
       onSugTextChange(data);
+      return;
+    }
+    if (type === "editPosition" && editPosition) {
+      editPosition(data);
+      return;
+    }
+    if (type === "sizeChange" && onSizeChange) {
+      onSizeChange(data);
       return;
     }
   };
