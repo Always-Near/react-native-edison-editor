@@ -88,16 +88,15 @@ class App extends React.Component<any, State> {
         .keySeq()
         .findIndex((k) => k === currentBlockKey);
 
+      this.postMessage(
+        "editPosition",
+        document
+          .getElementsByClassName("notranslate public-DraftEditor-content")[0]
+          .children[0].children[currentBlockIndex].getBoundingClientRect().top
+      );
+
       if (document.body.scrollHeight != this.state.height) {
         this.postMessage("sizeChange", document.body.scrollHeight);
-
-        this.postMessage(
-          "editPosition",
-          document
-            .getElementsByClassName("notranslate public-DraftEditor-content")[0]
-            .children[0].children[currentBlockIndex].getBoundingClientRect().top
-        );
-
         this.setState({ height: document.body.scrollHeight });
       }
     });
