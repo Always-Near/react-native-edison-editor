@@ -81,7 +81,6 @@ class App extends React.Component<any, State> {
         "editorChange",
         stateToHTML(this.state.editorState.getCurrentContent())
       );
-<<<<<<< HEAD
 
       const currentBlockKey = editorState.getSelection().getStartKey();
       const currentBlockMap = editorState.getCurrentContent().getBlockMap();
@@ -101,12 +100,10 @@ class App extends React.Component<any, State> {
         this.postMessage("sizeChange", document.body.scrollHeight);
         this.setState({ height: document.body.scrollHeight });
       }
-=======
       this.postMessage(
         "activeStyleChange",
         JSON.stringify(editorState.getCurrentInlineStyle().toArray())
       );
->>>>>>> master
     });
   };
 
