@@ -23,7 +23,6 @@ type State = {
   from: Contact[];
   subject: string;
   suggestions: ContactWithAvatar[];
-  height: number;
 };
 
 class App extends React.Component<any, State> {
@@ -40,7 +39,6 @@ class App extends React.Component<any, State> {
       from: [],
       subject: "",
       suggestions: [],
-      height: document.body.scrollHeight,
     };
     this._draftEditorRef = createRef<Editor>();
   }
@@ -82,6 +80,8 @@ class App extends React.Component<any, State> {
         stateToHTML(this.state.editorState.getCurrentContent())
       );
 
+      this.postMessage("sizeChange", document.body.scrollHeight);
+
       const currentBlockKey = editorState.getSelection().getStartKey();
       const currentBlockMap = editorState.getCurrentContent().getBlockMap();
 
@@ -96,10 +96,6 @@ class App extends React.Component<any, State> {
           .children[0].children[currentBlockIndex].getBoundingClientRect().top
       );
 
-      if (document.body.scrollHeight != this.state.height) {
-        this.postMessage("sizeChange", document.body.scrollHeight);
-        this.setState({ height: document.body.scrollHeight });
-      }
       this.postMessage(
         "activeStyleChange",
         JSON.stringify(editorState.getCurrentInlineStyle().toArray())
