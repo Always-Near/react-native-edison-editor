@@ -70,7 +70,7 @@ class App extends React.Component<any, State> {
 
       this.postMessage(
         EventName.ActiveStyleChange,
-        JSON.stringify(editorState.getCurrentInlineStyle().toArray())
+        editorState.getCurrentInlineStyle().toArray()
       );
 
       setTimeout(() => {

@@ -12,6 +12,9 @@ import Package from "./package.json";
 
 import "./index.html";
 
+export type { InlineStyleType } from "edison-editor";
+export type { AtomicBlockType, AtomicBlockProps } from "edison-editor";
+
 // It must be consistent with `draft-js/src/types.d.ts`
 const InjectScriptName = {
   ToggleBlockType: "toggleBlockType",
@@ -40,7 +43,7 @@ type PropTypes = {
   defaultValue?: string;
   placeholder?: string;
   onEditorReady?: () => void;
-  onActiveStyleChange?: (styles: string[]) => void;
+  onActiveStyleChange?: (styles: InlineStyleType[]) => void;
   onSizeChange?: (size: number) => void;
   editPosition?: (pos: number) => void;
   onEditorChange?: (content: string) => void;
