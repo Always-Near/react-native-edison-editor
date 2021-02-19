@@ -12,38 +12,40 @@ import Package from "./package.json";
 
 import "./index.html";
 
-export interface Contact {
-  name: string;
-  email: string;
-}
+// It must be consistent with `draft-js/src/types.d.ts`
+const InjectScriptName = {
+  ToggleBlockType: "toggleBlockType",
+  ToggleInlineStyle: "toggleInlineStyle",
+  ToggleSpecialType: "toggleSpecialType",
+  SetDefaultValue: "setDefaultValue",
+  SetEditorPlaceholder: "setEditorPlaceholder",
+  OnAddAtomicBlock: "onAddAtomicBlock",
+  FocusTextEditor: "focusTextEditor",
+  BlurTextEditor: "blurTextEditor",
+} as const;
 
-export interface ContactWithAvatar {
-  name: string;
-  email: string;
-  avatar: string;
-}
+// It must be consistent with `draft-js/src/App.tsx`
+const EventName = {
+  IsMounted: "isMounted",
+  EditorChange: "editorChange",
+  ActiveStyleChange: "activeStyleChange",
+  SizeChange: "sizeChange",
+  EditPosition: "editPosition",
+  OnFocus: "onFocus",
+  OnBlur: "onBlur",
+} as const;
 
 type PropTypes = {
   style?: ViewStyle;
   defaultValue?: string;
   placeholder?: string;
-  to?: Contact[];
-  cc?: Contact[];
-  bcc?: Contact[];
-  from?: Contact;
-  subject?: string;
-  showHeader?: boolean;
-  suggestions?: ContactWithAvatar[];
   onEditorReady?: () => void;
   onActiveStyleChange?: (styles: string[]) => void;
-  onToChange?: (constactList: Contact[]) => void;
-  onCcChange?: (constactList: Contact[]) => void;
-  onBccChange?: (constactList: Contact[]) => void;
-  onSubjectChange?: (subject: string) => void;
-  onSugTextChange?: (subject: string) => void;
   onSizeChange?: (size: number) => void;
   editPosition?: (pos: number) => void;
   onEditorChange?: (content: string) => void;
+  onBlur?: () => void;
+  onFocus?: () => void;
 };
 
 class RNDraftView extends Component<PropTypes> {
@@ -53,26 +55,10 @@ class RNDraftView extends Component<PropTypes> {
     editorState: "",
   };
 
-  checkSuggestionChange = (suggestions?: ContactWithAvatar[]) => {
-    if (!suggestions) {
-      return "";
-    }
-    return suggestions.reduce((pre, s) => pre + s.email, "");
-  };
-
-  UNSAFE_componentWillReceiveProps(next: PropTypes) {
-    if (
-      this.checkSuggestionChange(next.suggestions) !==
-      this.checkSuggestionChange(this.props.suggestions)
-    ) {
-      this.executeScript(
-        "setSuggestions",
-        JSON.stringify(next.suggestions || [])
-      );
-    }
-  }
-
-  private executeScript = (functionName: string, parameter?: string) => {
+  private executeScript = (
+    functionName: typeof InjectScriptName[keyof typeof InjectScriptName],
+    parameter?: string
+  ) => {
     if (this.webViewRef.current) {
       this.webViewRef.current.injectJavaScript(
         `window.${functionName}(${parameter ? `'${parameter}'` : ""});true;`
@@ -82,55 +68,46 @@ class RNDraftView extends Component<PropTypes> {
 
   private onMessage = (event: WebViewMessageEvent) => {
     const {
-      onToChange,
-      onCcChange,
-      onBccChange,
-      onSubjectChange,
-      onSugTextChange,
       onEditorChange,
       onActiveStyleChange,
       editPosition,
       onSizeChange,
+      onBlur,
+      onFocus,
     } = this.props;
-    const { type, data } = JSON.parse(event.nativeEvent.data);
-    if (type === "isMounted") {
+    const {
+      type,
+      data,
+    }: {
+      type: typeof EventName[keyof typeof EventName];
+      data: any;
+    } = JSON.parse(event.nativeEvent.data);
+    if (type === EventName.IsMounted) {
       this.widgetMounted();
       return;
     }
-    if (type === "editorChange") {
+    if (type === EventName.EditorChange) {
       onEditorChange && onEditorChange(data.replace(/(\r\n|\n|\r)/gm, ""));
       this.setState({ editorState: data.replace(/(\r\n|\n|\r)/gm, "") });
       return;
     }
-    if (type === "activeStyleChange") {
+    if (type === EventName.ActiveStyleChange) {
       onActiveStyleChange && onActiveStyleChange(data);
     }
-    if (type === "toChange" && onToChange) {
-      onToChange(data);
-      return;
-    }
-    if (type === "ccChange" && onCcChange) {
-      onCcChange(data);
-      return;
-    }
-    if (type === "bccChange" && onBccChange) {
-      onBccChange(data);
-      return;
-    }
-    if (type === "subjectChange" && onSubjectChange) {
-      onSubjectChange(data);
-      return;
-    }
-    if (type === "sugTextChange" && onSugTextChange) {
-      onSugTextChange(data);
-      return;
-    }
-    if (type === "editPosition" && editPosition) {
+    if (type === EventName.EditPosition && editPosition) {
       editPosition(data);
       return;
     }
-    if (type === "sizeChange" && onSizeChange) {
+    if (type === EventName.SizeChange && onSizeChange) {
       onSizeChange(data);
+      return;
+    }
+    if (type === EventName.OnBlur && onBlur) {
+      onBlur();
+      return;
+    }
+    if (type === EventName.OnFocus && onFocus) {
+      onFocus();
       return;
     }
   };
@@ -139,38 +116,15 @@ class RNDraftView extends Component<PropTypes> {
     const {
       placeholder,
       defaultValue,
-      to,
-      cc,
-      bcc,
-      from,
-      subject,
-      showHeader = false,
       onEditorReady = () => null,
     } = this.props;
 
-    this.executeScript("setHeaderVisible", showHeader.toString());
-
     if (defaultValue) {
       const formatHtml = Buffer.from(defaultValue, "utf-8").toString("base64");
-      this.executeScript("setDefaultValue", formatHtml);
+      this.executeScript(InjectScriptName.SetDefaultValue, formatHtml);
     }
     if (placeholder) {
-      this.executeScript("setEditorPlaceholder", placeholder);
-    }
-    if (to) {
-      this.executeScript("setDefaultTo", JSON.stringify(to));
-    }
-    if (cc) {
-      this.executeScript("setDefaultCc", JSON.stringify(cc));
-    }
-    if (bcc) {
-      this.executeScript("setDefaultBcc", JSON.stringify(bcc));
-    }
-    if (from) {
-      this.executeScript("setDefaultFrom", JSON.stringify(from));
-    }
-    if (subject) {
-      this.executeScript("setDefaultSubject", subject);
+      this.executeScript(InjectScriptName.SetEditorPlaceholder, placeholder);
     }
     onEditorReady();
   };
@@ -179,27 +133,30 @@ class RNDraftView extends Component<PropTypes> {
     type: T,
     params: AtomicBlockProps<T>
   ) => {
-    this.executeScript("onAddAtomicBlock", JSON.stringify({ type, params }));
+    this.executeScript(
+      InjectScriptName.OnAddAtomicBlock,
+      JSON.stringify({ type, params })
+    );
   };
 
   focus = () => {
-    this.executeScript("focusTextEditor");
+    this.executeScript(InjectScriptName.FocusTextEditor);
   };
 
   blur = () => {
-    this.executeScript("blurTextEditor");
+    this.executeScript(InjectScriptName.BlurTextEditor);
   };
 
   setStyle = (style: InlineStyleType) => {
-    this.executeScript("toggleInlineStyle", style);
+    this.executeScript(InjectScriptName.ToggleInlineStyle, style);
   };
 
   setBlockType = (blockType: "unordered-list-item" | "ordered-list-item") => {
-    this.executeScript("toggleBlockType", blockType);
+    this.executeScript(InjectScriptName.ToggleBlockType, blockType);
   };
 
   setSpecialType = (command: "CLEAR" | "IndentIncrease" | "IndentDecrease") => {
-    this.executeScript("toggleSpecialType", command);
+    this.executeScript(InjectScriptName.ToggleSpecialType, command);
   };
 
   addImage = (src: string) => {

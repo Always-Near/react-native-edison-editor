@@ -10,19 +10,21 @@ import {
 import EdisonEditor, { EdisonUtil } from "edison-editor";
 import { stateToHTML } from "draft-js-export-html";
 import { Buffer } from "buffer";
-import Header from "./Header";
 import "./styles";
+
+const EventName = {
+  IsMounted: "isMounted",
+  EditorChange: "editorChange",
+  ActiveStyleChange: "activeStyleChange",
+  SizeChange: "sizeChange",
+  EditPosition: "editPosition",
+  OnFocus: "onFocus",
+  OnBlur: "onBlur",
+} as const;
 
 type State = {
   editorState: EditorState;
-  headerVisible: boolean;
   placeholder: string;
-  to: Contact[];
-  cc: Contact[];
-  bcc: Contact[];
-  from: Contact[];
-  subject: string;
-  suggestions: ContactWithAvatar[];
 };
 
 class App extends React.Component<any, State> {
@@ -31,35 +33,21 @@ class App extends React.Component<any, State> {
     super(props);
     this.state = {
       editorState: EditorState.createEmpty(),
-      headerVisible: false,
       placeholder: "",
-      to: [],
-      cc: [],
-      bcc: [],
-      from: [],
-      subject: "",
-      suggestions: [],
     };
     this._draftEditorRef = createRef<Editor>();
   }
 
   componentDidMount() {
-    this.postMessage("isMounted", true);
+    this.postMessage(EventName.IsMounted, true);
     window.toggleBlockType = this.toggleBlockType;
     window.toggleInlineStyle = this.toggleInlineStyle;
     window.toggleSpecialType = this.toggleSpecialType;
-    window.setHeaderVisible = this.setHeaderVisible;
     window.setDefaultValue = this.setDefaultValue;
     window.setEditorPlaceholder = this.setEditorPlaceholder;
-    window.setDefaultTo = this.setDefaultTo;
-    window.setDefaultCc = this.setDefaultCc;
-    window.setDefaultBcc = this.setDefaultBcc;
-    window.setDefaultFrom = this.setDefaultFrom;
-    window.setDefaultSubject = this.setDefaultSubject;
     window.onAddAtomicBlock = this.onAddAtomicBlock;
     window.focusTextEditor = this.focusTextEditor;
     window.blurTextEditor = this.blurTextEditor;
-    window.setSuggestions = this.setSuggestions;
   }
 
   private postMessage = (type: string, data: any) => {
@@ -76,17 +64,17 @@ class App extends React.Component<any, State> {
   private setEditorState = (editorState: EditorState) => {
     this.setState({ editorState }, () => {
       this.postMessage(
-        "editorChange",
+        EventName.EditorChange,
         stateToHTML(this.state.editorState.getCurrentContent())
       );
 
       this.postMessage(
-        "activeStyleChange",
+        EventName.ActiveStyleChange,
         JSON.stringify(editorState.getCurrentInlineStyle().toArray())
       );
 
       setTimeout(() => {
-        this.postMessage("sizeChange", document.body.scrollHeight);
+        this.postMessage(EventName.SizeChange, document.body.scrollHeight);
         const currentBlockKey = editorState.getSelection().getStartKey();
         const currentBlockMap = editorState.getCurrentContent().getBlockMap();
 
@@ -95,7 +83,7 @@ class App extends React.Component<any, State> {
           .findIndex((k) => k === currentBlockKey);
 
         this.postMessage(
-          "editPosition",
+          EventName.EditPosition,
           document
             .getElementsByClassName("notranslate public-DraftEditor-content")[0]
             .children[0].children[currentBlockIndex].getBoundingClientRect().top
@@ -131,24 +119,6 @@ class App extends React.Component<any, State> {
     }
   };
 
-  private onContactChange = (
-    type: "to" | "cc" | "bcc",
-    contactList: Contact[]
-  ) => {
-    const newState = { [type]: contactList } as { to: Contact[] };
-    this.setState(newState);
-    this.postMessage(`${type}Change`, contactList);
-  };
-
-  private onSubjectChange = (str: string) => {
-    this.setState({ subject: str });
-    this.postMessage("subjectChange", str);
-  };
-
-  private onSugTextChange = (str: string) => {
-    this.postMessage("sugTextChange", str);
-  };
-
   // publish functions
 
   private toggleSpecialType = (command: string) => {
@@ -177,10 +147,6 @@ class App extends React.Component<any, State> {
     this.setEditorState(RichUtils.toggleInlineStyle(editorState, inlineStyle));
   };
 
-  private setHeaderVisible = (headerVisible: string) => {
-    this.setState({ headerVisible: headerVisible === true.toString() });
-  };
-
   private setDefaultValue = (html: string) => {
     try {
       if (html) {
@@ -197,57 +163,8 @@ class App extends React.Component<any, State> {
     }
   };
 
-  private setDefaultTo = (to: string) => {
-    try {
-      const contactList = JSON.parse(to) as Contact[];
-      this.setState({ to: contactList });
-    } catch (err) {
-      console.error(err.message);
-    }
-  };
-
-  private setDefaultCc = (cc: string) => {
-    try {
-      const contactList = JSON.parse(cc) as Contact[];
-      this.setState({ cc: contactList });
-    } catch (err) {
-      console.error(err.message);
-    }
-  };
-
-  private setDefaultBcc = (bcc: string) => {
-    try {
-      const contactList = JSON.parse(bcc) as Contact[];
-      this.setState({ bcc: contactList });
-    } catch (err) {
-      console.error(err.message);
-    }
-  };
-
-  private setDefaultFrom = (from: string) => {
-    try {
-      const contact = JSON.parse(from) as Contact;
-      this.setState({ from: [contact] });
-    } catch (err) {
-      console.error(err.message);
-    }
-  };
-
-  private setDefaultSubject = (subject: string) => {
-    this.setState({ subject });
-  };
-
   private setEditorPlaceholder = (placeholder: string) => {
     this.setState({ placeholder });
-  };
-
-  private setSuggestions = (contacts: string) => {
-    try {
-      const suggestions = JSON.parse(contacts) as ContactWithAvatar[];
-      this.setState({ suggestions });
-    } catch (err) {
-      console.error(err.message);
-    }
   };
 
   private onAddAtomicBlock = (paramsStr: string) => {
@@ -269,39 +186,22 @@ class App extends React.Component<any, State> {
     this._draftEditorRef.current && this._draftEditorRef.current.blur();
   };
 
+  private onFocus = () => {
+    this.postMessage(EventName.OnFocus, true);
+  };
+
+  private onBlur = () => {
+    this.postMessage(EventName.OnBlur, true);
+  };
+
   render() {
-    const {
-      headerVisible,
-      to,
-      cc,
-      bcc,
-      from,
-      subject,
-      placeholder,
-      editorState,
-      suggestions,
-    } = this.state;
+    const { placeholder, editorState } = this.state;
 
     return (
       <>
         <style>
           {`.public-DraftEditorPlaceholder-root{position: absolute;color: silver;pointer-events: none;z-index: -10000;}`}
         </style>
-        {headerVisible ? (
-          <Header
-            to={to}
-            cc={cc}
-            bcc={bcc}
-            from={from}
-            subject={subject}
-            onToChange={(contact) => this.onContactChange("to", contact)}
-            onCcChange={(contact) => this.onContactChange("cc", contact)}
-            onBccChange={(contact) => this.onContactChange("bcc", contact)}
-            onSubjectChange={this.onSubjectChange}
-            onSugTextChange={this.onSugTextChange}
-            suggestions={suggestions}
-          />
-        ) : null}
         <div className={"compose-editor"}>
           <EdisonEditor
             ref={this._draftEditorRef}
@@ -310,6 +210,8 @@ class App extends React.Component<any, State> {
             handleKeyCommand={this.handleKeyCommand}
             keyBindingFn={this.mapKeyToEditorCommand}
             placeholder={placeholder}
+            onFocus={this.onFocus}
+            onBlur={this.onBlur}
           />
         </div>
       </>
