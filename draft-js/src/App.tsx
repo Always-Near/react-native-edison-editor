@@ -80,26 +80,27 @@ class App extends React.Component<any, State> {
         stateToHTML(this.state.editorState.getCurrentContent())
       );
 
-      this.postMessage("sizeChange", document.body.scrollHeight);
-
-      const currentBlockKey = editorState.getSelection().getStartKey();
-      const currentBlockMap = editorState.getCurrentContent().getBlockMap();
-
-      const currentBlockIndex = currentBlockMap
-        .keySeq()
-        .findIndex((k) => k === currentBlockKey);
-
-      this.postMessage(
-        "editPosition",
-        document
-          .getElementsByClassName("notranslate public-DraftEditor-content")[0]
-          .children[0].children[currentBlockIndex].getBoundingClientRect().top
-      );
-
       this.postMessage(
         "activeStyleChange",
         JSON.stringify(editorState.getCurrentInlineStyle().toArray())
       );
+
+      setTimeout(() => {
+        this.postMessage("sizeChange", document.body.scrollHeight);
+        const currentBlockKey = editorState.getSelection().getStartKey();
+        const currentBlockMap = editorState.getCurrentContent().getBlockMap();
+
+        const currentBlockIndex = currentBlockMap
+          .keySeq()
+          .findIndex((k) => k === currentBlockKey);
+
+        this.postMessage(
+          "editPosition",
+          document
+            .getElementsByClassName("notranslate public-DraftEditor-content")[0]
+            .children[0].children[currentBlockIndex].getBoundingClientRect().top
+        );
+      }, 50);
     });
   };
 

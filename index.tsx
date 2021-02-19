@@ -221,6 +221,7 @@ class RNDraftView extends Component<PropTypes> {
         keyboardDisplayRequiresUserAction={false}
         originWhitelist={["*"]}
         onMessage={this.onMessage}
+        scrollEnabled={false}
       />
     );
   }
