@@ -2309,12 +2309,13 @@ duplexify@^3.4.2, duplexify@^3.6.0:
     readable-stream "^2.0.0"
     stream-shift "^1.0.0"
 
-edison-editor@0.1.10:
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/edison-editor/-/edison-editor-0.1.10.tgz#9559f08884d725a3edbdda079232d2519cea9908"
-  integrity sha512-B4ixLdScgr5H69REkovJomiazyXzldoyKQgJunQo7kPJ5Ejbts9C4+/F44o6asK4wmbUEK3dGXRhnTaKKsHpIw==
+edison-editor@0.1.12:
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/edison-editor/-/edison-editor-0.1.12.tgz#729ac084812f5d00c4a50c708fd7f726580ecfd3"
+  integrity sha512-chWYVJril3y8inrrrnndsDTE5TeRgcShpdhX21Noux4bc/vSCI1mAWpDxEygSvCRFeJP46VQ9I0Fthhpp22Avg==
   dependencies:
     "@types/draft-js" "^0.10.44"
+    html-to-draftjs "^1.5.0"
 
 ee-first@1.1.1:
   version "1.1.1"
@@ -3032,6 +3033,11 @@ html-minifier-terser@^5.0.1:
     param-case "^3.0.3"
     relateurl "^0.2.7"
     terser "^4.6.3"
+
+html-to-draftjs@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/html-to-draftjs/-/html-to-draftjs-1.5.0.tgz#0df0eabf429deaedb63f5c859889e2c983606e86"
+  integrity sha512-kggLXBNciKDwKf+KYsuE+V5gw4dZ7nHyGMX9m0wy7urzWjKGWyNFetmArRLvRV0VrxKN70WylFsJvMTJx02OBQ==
 
 html-webpack-plugin@^4.5.1:
   version "4.5.2"

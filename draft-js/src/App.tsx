@@ -1,12 +1,5 @@
 import React, { createRef } from "react";
-import {
-  Editor,
-  EditorState,
-  ContentState,
-  RichUtils,
-  getDefaultKeyBinding,
-  convertFromHTML,
-} from "draft-js";
+import { Editor, EditorState, RichUtils, getDefaultKeyBinding } from "draft-js";
 import EdisonEditor, { EdisonUtil } from "edison-editor";
 import { stateToHTML } from "draft-js-export-html";
 import { Buffer } from "buffer";
@@ -32,7 +25,7 @@ class App extends React.Component<any, State> {
   constructor(props: any) {
     super(props);
     this.state = {
-      editorState: EditorState.createEmpty(),
+      editorState: EdisonUtil.htmlToState(""),
       placeholder: "",
     };
     this._draftEditorRef = createRef<Editor>();
@@ -150,13 +143,9 @@ class App extends React.Component<any, State> {
   private setDefaultValue = (html: string) => {
     try {
       if (html) {
-        const formatHtml = Buffer.from(html, "base64").toString("utf-8");
-        const blocksFromHTML = convertFromHTML(formatHtml);
-        const state = ContentState.createFromBlockArray(
-          blocksFromHTML.contentBlocks,
-          blocksFromHTML.entityMap
-        );
-        this.setEditorState(EditorState.createWithContent(state));
+        const htmlStr = Buffer.from(html, "base64").toString("utf-8");
+        const newState = EdisonUtil.htmlToState(htmlStr);
+        this.setEditorState(newState);
       }
     } catch (e) {
       console.error(e);
