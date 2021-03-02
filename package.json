@@ -1,6 +1,6 @@
 {
   "name": "react-native-edison-editor",
-  "version": "0.10.22",
+  "version": "0.10.24",
   "description": "A full fledged React Native Rich Text editor based on draft.js",
   "main": "index.js",
   "types": "index.d.ts",
@@ -40,7 +40,6 @@
     "css-loader": "^5.0.1",
     "draft-js": "^0.11.7",
     "draft-js-export-html": "^1.3.3",
-    "html-to-draftjs": "^1.5.0",
     "html-webpack-plugin": "^4.5.1",
     "less": "^4.1.0",
     "less-loader": "^7.2.1",
@@ -57,7 +56,7 @@
   },
   "dependencies": {
     "buffer": "^6.0.0",
-    "edison-editor": "0.1.12",
+    "edison-editor": "0.1.14",
     "react-native-fs": "^2.16.6"
   }
 }
