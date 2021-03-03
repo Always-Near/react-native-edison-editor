@@ -21,6 +21,7 @@ const InjectScriptName = {
   ToggleInlineStyle: "toggleInlineStyle",
   ToggleSpecialType: "toggleSpecialType",
   SetDefaultValue: "setDefaultValue",
+  SetStyle: "setStyle",
   SetEditorPlaceholder: "setEditorPlaceholder",
   OnAddAtomicBlock: "onAddAtomicBlock",
   FocusTextEditor: "focusTextEditor",
@@ -40,6 +41,7 @@ const EventName = {
 
 type PropTypes = {
   style?: ViewStyle;
+  contentStyle?: React.CSSProperties;
   defaultValue?: string;
   placeholder?: string;
   onEditorReady?: () => void;
@@ -119,12 +121,19 @@ class RNDraftView extends Component<PropTypes> {
     const {
       placeholder,
       defaultValue,
+      contentStyle,
       onEditorReady = () => null,
     } = this.props;
 
     if (defaultValue) {
       const formatHtml = Buffer.from(defaultValue, "utf-8").toString("base64");
       this.executeScript(InjectScriptName.SetDefaultValue, formatHtml);
+    }
+    if (contentStyle) {
+      this.executeScript(
+        InjectScriptName.SetStyle,
+        JSON.stringify(contentStyle)
+      );
     }
     if (placeholder) {
       this.executeScript(InjectScriptName.SetEditorPlaceholder, placeholder);

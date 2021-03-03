@@ -4,6 +4,7 @@ declare interface Window {
   toggleInlineStyle: (inlineStyle: string) => void;
   toggleSpecialType: (command: string) => void;
   setDefaultValue: (html: string) => void;
+  setStyle: (style: string) => void;
   setEditorPlaceholder: (placeholder: string) => void;
   onAddAtomicBlock: (paramsStr: string) => void;
   focusTextEditor: () => void;

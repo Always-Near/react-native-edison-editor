@@ -18,6 +18,7 @@ const EventName = {
 type State = {
   editorState: EditorState;
   placeholder: string;
+  style: React.CSSProperties;
 };
 
 class App extends React.Component<any, State> {
@@ -27,6 +28,7 @@ class App extends React.Component<any, State> {
     this.state = {
       editorState: EdisonUtil.htmlToState(""),
       placeholder: "",
+      style: {},
     };
     this._draftEditorRef = createRef<Editor>();
   }
@@ -37,6 +39,7 @@ class App extends React.Component<any, State> {
     window.toggleInlineStyle = this.toggleInlineStyle;
     window.toggleSpecialType = this.toggleSpecialType;
     window.setDefaultValue = this.setDefaultValue;
+    window.setStyle = this.setStyle;
     window.setEditorPlaceholder = this.setEditorPlaceholder;
     window.onAddAtomicBlock = this.onAddAtomicBlock;
     window.focusTextEditor = this.focusTextEditor;
@@ -154,6 +157,15 @@ class App extends React.Component<any, State> {
     }
   };
 
+  private setStyle = (style: string) => {
+    try {
+      const styleJson = JSON.parse(style);
+      this.setState({ style: styleJson });
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
   private setEditorPlaceholder = (placeholder: string) => {
     this.setState({ placeholder });
   };
@@ -186,14 +198,14 @@ class App extends React.Component<any, State> {
   };
 
   render() {
-    const { placeholder, editorState } = this.state;
+    const { placeholder, editorState, style } = this.state;
 
     return (
       <>
         <style>
           {`.public-DraftEditorPlaceholder-root{position: absolute;color: silver;pointer-events: none;z-index: -10000;}`}
         </style>
-        <div className={"compose-editor"}>
+        <div className={"compose-editor"} style={style}>
           <EdisonEditor
             ref={this._draftEditorRef}
             editorState={editorState}
