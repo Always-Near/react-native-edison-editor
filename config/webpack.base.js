@@ -8,7 +8,7 @@ module.exports = {
     path: config.appPath,
   },
   resolve: {
-    extensions: [".js", ".json", ".jsx", ".ts", ".tsx", ".less"],
+    extensions: [".js", ".json", ".jsx", ".ts", ".tsx", ".less", ".css"],
   },
   module: {
     rules: [
@@ -34,8 +34,6 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        include: config.srcPath,
-        exclude: /node_modules/,
         use: ["style-loader", "css-loader"],
       },
       {

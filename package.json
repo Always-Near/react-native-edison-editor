@@ -56,7 +56,7 @@
   },
   "dependencies": {
     "buffer": "^6.0.0",
-    "edison-editor": "0.1.15",
+    "edison-editor": "0.1.20",
     "react-native-fs": "^2.16.6"
   }
 }
