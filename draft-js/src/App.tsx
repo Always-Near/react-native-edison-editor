@@ -144,7 +144,9 @@ class App extends React.Component<any, State> {
     try {
       if (html) {
         const htmlStr = Buffer.from(html, "base64").toString("utf-8");
-        const newState = EdisonUtil.htmlToState(htmlStr);
+        // clear the meta to keep style
+        const reg = /<meta[^<>]*name="viewport"[^<>]*\/?>/g;
+        const newState = EdisonUtil.htmlToState(htmlStr.replace(reg, ""));
         this.setEditorState(newState);
       }
     } catch (e) {
