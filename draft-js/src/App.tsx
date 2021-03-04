@@ -88,7 +88,24 @@ class App extends React.Component<any, State> {
     });
   };
 
-  private handleKeyCommand = (command: string, editorState: EditorState) => {
+  private onTab = (shiftKey: boolean) => {
+    const { editorState } = this.state;
+    if (shiftKey) {
+      this.setEditorState(EdisonUtil.indentDecrease(editorState));
+    } else {
+      this.setEditorState(EdisonUtil.indentIncrease(editorState));
+    }
+  };
+
+  private onBackSpace = (editorState: EditorState) => {
+    if (EdisonUtil.isInIndentBlockBeginning(editorState)) {
+      this.setEditorState(EdisonUtil.indentDecrease(editorState));
+      return "handled";
+    }
+    return this.onNormalCommand("backspace", editorState);
+  };
+
+  private onNormalCommand = (command: string, editorState: EditorState) => {
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
       this.setEditorState(newState);
@@ -97,22 +114,21 @@ class App extends React.Component<any, State> {
     return "not-handled";
   };
 
-  private mapKeyToEditorCommand = (e: React.KeyboardEvent) => {
-    const { editorState } = this.state;
-    switch (e.key) {
-      case "Tab":
-        const newEditorState = RichUtils.onTab(
-          e,
-          editorState,
-          4 /* maxDepth */
-        );
-        if (newEditorState !== editorState) {
-          this.setEditorState(editorState);
-        }
-        return null;
-      default:
-        return getDefaultKeyBinding(e);
+  private handleKeyCommand = (command: string, editorState: EditorState) => {
+    if (command === "backspace") {
+      return this.onBackSpace(editorState);
     }
+    return this.onNormalCommand(command, editorState);
+  };
+
+  private mapKeyToEditorCommand = (e: React.KeyboardEvent) => {
+    if (e.code === "Tab") {
+      e.stopPropagation();
+      e.preventDefault();
+      this.onTab(e.shiftKey);
+      return null;
+    }
+    return getDefaultKeyBinding(e);
   };
 
   // publish functions
