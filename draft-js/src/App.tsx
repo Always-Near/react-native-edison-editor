@@ -44,6 +44,10 @@ class App extends React.Component<any, State> {
     window.onAddAtomicBlock = this.onAddAtomicBlock;
     window.focusTextEditor = this.focusTextEditor;
     window.blurTextEditor = this.blurTextEditor;
+    // add blur event listener
+    window.onblur = () => {
+      this.postMessage(EventName.OnBlur, true);
+    };
   }
 
   private postMessage = (type: string, data: any) => {
