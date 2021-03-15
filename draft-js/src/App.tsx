@@ -48,6 +48,12 @@ class App extends React.Component<any, State> {
     window.onblur = () => {
       this.postMessage(EventName.OnBlur, true);
     };
+    window.onfocus = () => {
+      setTimeout(() => {
+        this.postMessage(EventName.OnFocus, true);
+        this.focusTextEditor();
+      }, 200);
+    };
   }
 
   private postMessage = (type: string, data: any) => {
