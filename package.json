@@ -1,6 +1,6 @@
 {
   "name": "react-native-edison-editor",
-  "version": "0.10.37",
+  "version": "0.10.38",
   "description": "A full fledged React Native Rich Text editor based on draft.js",
   "main": "index.js",
   "types": "index.d.ts",
