@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { ViewStyle } from "react-native";
+import { ViewStyle, View, Text } from "react-native";
 import WebView, { WebViewMessageEvent } from "react-native-webview";
 import RNFS from "react-native-fs";
 import { Buffer } from "buffer";
@@ -60,6 +60,7 @@ class RNDraftView extends Component<PropTypes> {
 
   state = {
     editorState: "",
+    loading: true,
   };
 
   private executeScript = (
@@ -144,6 +145,9 @@ class RNDraftView extends Component<PropTypes> {
     this.executeScript(InjectScriptName.SetIsDarkMode, isDarkMode.toString());
 
     onEditorReady();
+    setTimeout(() => {
+      this.setState({ loading: false });
+    }, 200);
   };
 
   private onAddAtomicBlock = <T extends AtomicBlockType>(
@@ -188,15 +192,31 @@ class RNDraftView extends Component<PropTypes> {
     const { style = { flex: 1 } } = this.props;
     const htmlPath = `file://${RNFS.MainBundlePath}/assets/node_modules/${Package.name}/index.html`;
     return (
-      <WebView
-        ref={this.webViewRef}
-        style={style}
-        source={{ uri: htmlPath }}
-        keyboardDisplayRequiresUserAction={false}
-        originWhitelist={["*"]}
-        onMessage={this.onMessage}
-        scrollEnabled={false}
-      />
+      <View>
+        <WebView
+          ref={this.webViewRef}
+          style={style}
+          source={{ uri: htmlPath }}
+          keyboardDisplayRequiresUserAction={false}
+          originWhitelist={["*"]}
+          onMessage={this.onMessage}
+          scrollEnabled={false}
+        />
+        {this.state.loading && (
+          <View
+            style={{
+              ...style,
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          ></View>
+        )}
+      </View>
     );
   }
 }
