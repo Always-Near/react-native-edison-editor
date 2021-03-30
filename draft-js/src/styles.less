@@ -10,4 +10,29 @@
       max-width: 100%;
     }
   }
+
+  .public-DraftEditorPlaceholder-root {
+    position: absolute;
+    color: silver;
+    pointer-events: none;
+    z-index: -10000;
+  }
+}
+
+.dark_mode {
+  * {
+    background-color: inherit;
+  }
+
+  img:not([src*=".svg"]),
+  video {
+    filter: invert(100%);
+  }
+}
+
+.public-DraftEditorPlaceholder-root {
+  position: absolute;
+  color: silver;
+  pointer-events: none;
+  z-index: -10000;
 }

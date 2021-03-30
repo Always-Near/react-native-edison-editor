@@ -22,6 +22,7 @@ const InjectScriptName = {
   ToggleSpecialType: "toggleSpecialType",
   SetDefaultValue: "setDefaultValue",
   SetStyle: "setStyle",
+  SetIsDarkMode: "setIsDarkMode",
   SetEditorPlaceholder: "setEditorPlaceholder",
   OnAddAtomicBlock: "onAddAtomicBlock",
   FocusTextEditor: "focusTextEditor",
@@ -44,6 +45,7 @@ type PropTypes = {
   contentStyle?: React.CSSProperties;
   defaultValue?: string;
   placeholder?: string;
+  isDarkMode?: boolean;
   onEditorReady?: () => void;
   onActiveStyleChange?: (styles: InlineStyleType[]) => void;
   onSizeChange?: (size: number) => void;
@@ -122,6 +124,7 @@ class RNDraftView extends Component<PropTypes> {
       placeholder,
       defaultValue,
       contentStyle,
+      isDarkMode = false,
       onEditorReady = () => null,
     } = this.props;
 
@@ -138,6 +141,8 @@ class RNDraftView extends Component<PropTypes> {
     if (placeholder) {
       this.executeScript(InjectScriptName.SetEditorPlaceholder, placeholder);
     }
+    this.executeScript(InjectScriptName.SetIsDarkMode, isDarkMode.toString());
+
     onEditorReady();
   };
 

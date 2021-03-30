@@ -19,7 +19,15 @@ type State = {
   editorState: EditorState;
   placeholder: string;
   style: React.CSSProperties;
+  isDarkMode: boolean;
 };
+
+const darkModeStyle = `
+  :root {
+    background-color: #fefefe;
+    filter: invert(100%);
+  }
+`;
 
 class App extends React.Component<any, State> {
   _draftEditorRef: React.RefObject<Editor>;
@@ -29,6 +37,7 @@ class App extends React.Component<any, State> {
       editorState: EdisonUtil.htmlToState(""),
       placeholder: "",
       style: {},
+      isDarkMode: false,
     };
     this._draftEditorRef = createRef<Editor>();
   }
@@ -40,6 +49,7 @@ class App extends React.Component<any, State> {
     window.toggleSpecialType = this.toggleSpecialType;
     window.setDefaultValue = this.setDefaultValue;
     window.setStyle = this.setStyle;
+    window.setIsDarkMode = this.setIsDarkMode;
     window.setEditorPlaceholder = this.setEditorPlaceholder;
     window.onAddAtomicBlock = this.onAddAtomicBlock;
     window.focusTextEditor = this.focusTextEditor;
@@ -192,6 +202,10 @@ class App extends React.Component<any, State> {
     }
   };
 
+  private setIsDarkMode = (isDarkMode: string) => {
+    this.setState({ isDarkMode: isDarkMode === "true" });
+  };
+
   private setEditorPlaceholder = (placeholder: string) => {
     this.setState({ placeholder });
   };
@@ -224,14 +238,15 @@ class App extends React.Component<any, State> {
   };
 
   render() {
-    const { placeholder, editorState, style } = this.state;
+    const { placeholder, editorState, style, isDarkMode } = this.state;
 
     return (
       <>
-        <style>
-          {`.public-DraftEditorPlaceholder-root{position: absolute;color: silver;pointer-events: none;z-index: -10000;}`}
-        </style>
-        <div className={"compose-editor"} style={style}>
+        <style>{isDarkMode ? darkModeStyle : ""}</style>
+        <div
+          className={`compose-editor ${isDarkMode ? "dark_mode" : ""}`}
+          style={style}
+        >
           <EdisonEditor
             ref={this._draftEditorRef}
             editorState={editorState}
