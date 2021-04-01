@@ -1,7 +1,6 @@
 import React, { createRef } from "react";
 import { Editor, EditorState, RichUtils, getDefaultKeyBinding } from "draft-js";
 import EdisonEditor, { EdisonUtil } from "edison-editor";
-import { stateToHTML } from "draft-js-export-html";
 import { Buffer } from "buffer";
 import "./styles";
 
@@ -81,7 +80,7 @@ class App extends React.Component<any, State> {
     this.setState({ editorState }, () => {
       this.postMessage(
         EventName.EditorChange,
-        stateToHTML(this.state.editorState.getCurrentContent())
+        EdisonUtil.stateToHTML(this.state.editorState)
       );
 
       this.postMessage(
