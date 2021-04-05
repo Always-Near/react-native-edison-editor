@@ -77,6 +77,7 @@ class App extends React.Component<any, State> {
   };
 
   private setEditorState = (editorState: EditorState) => {
+    // console.log("getting editor state");
     this.setState({ editorState }, () => {
       this.postMessage(
         EventName.EditorChange,
@@ -93,14 +94,13 @@ class App extends React.Component<any, State> {
       // only send the scroll position on events where the editor has focus
       if (selection.getHasFocus()) {
         setTimeout(() => {
-          this.postMessage(EventName.SizeChange, document.body.scrollHeight);
           const currentBlockKey = selection.getStartKey();
           const currentBlockMap = editorState.getCurrentContent().getBlockMap();
-
           const currentBlockIndex = currentBlockMap
             .keySeq()
             .findIndex((k) => k === currentBlockKey);
 
+          this.postMessage(EventName.SizeChange, document.body.scrollHeight);
           this.postMessage(
             EventName.EditPosition,
             document
@@ -108,7 +108,7 @@ class App extends React.Component<any, State> {
                 "notranslate public-DraftEditor-content"
               )[0]
               .children[0].children[currentBlockIndex].getBoundingClientRect()
-              .top
+              .bottom
           );
         }, 50);
       }
