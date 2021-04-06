@@ -88,22 +88,33 @@ class App extends React.Component<any, State> {
         editorState.getCurrentInlineStyle().toArray()
       );
 
-      setTimeout(() => {
-        this.postMessage(EventName.SizeChange, document.body.scrollHeight);
-        const currentBlockKey = editorState.getSelection().getStartKey();
-        const currentBlockMap = editorState.getCurrentContent().getBlockMap();
+      const selection = editorState.getSelection();
 
-        const currentBlockIndex = currentBlockMap
-          .keySeq()
-          .findIndex((k) => k === currentBlockKey);
+      // only send the scroll position on events when the editor has focus
+      if (selection.getHasFocus()) {
+        setTimeout(() => {
+          this.postMessage(EventName.SizeChange, document.body.scrollHeight);
 
-        this.postMessage(
-          EventName.EditPosition,
-          document
-            .getElementsByClassName("notranslate public-DraftEditor-content")[0]
-            .children[0].children[currentBlockIndex].getBoundingClientRect().top
-        );
-      }, 50);
+          // returns a value of 0 on empty lines
+          const pos = window
+            .getSelection()
+            ?.getRangeAt(0)
+            .getBoundingClientRect()?.bottom;
+
+          if (pos) {
+            this.postMessage(EventName.EditPosition, pos);
+          } else if (
+            window.getSelection()?.focusNode?.nodeType === Node.ELEMENT_NODE
+          ) {
+            // should catch new line events
+            const e = window.getSelection()?.focusNode as Element;
+            this.postMessage(
+              EventName.EditPosition,
+              e.getBoundingClientRect().bottom
+            );
+          }
+        }, 50);
+      }
     });
   };
 
