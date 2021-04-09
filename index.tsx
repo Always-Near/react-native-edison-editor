@@ -57,10 +57,26 @@ type PropTypes = {
 
 class RNDraftView extends Component<PropTypes> {
   private webViewRef = React.createRef<WebView>();
+  private webviewMounted: boolean = false;
 
   state = {
     editorState: "",
     loading: true,
+  };
+
+  UNSAFE_componentWillReceiveProps = (nextProps: PropTypes) => {
+    if (!this.webviewMounted) {
+      return;
+    }
+    if (
+      nextProps.isDarkMode !== undefined &&
+      nextProps.isDarkMode !== this.props.isDarkMode
+    ) {
+      this.executeScript(
+        InjectScriptName.SetIsDarkMode,
+        nextProps.isDarkMode.toString()
+      );
+    }
   };
 
   private executeScript = (
@@ -121,6 +137,8 @@ class RNDraftView extends Component<PropTypes> {
   };
 
   private widgetMounted = () => {
+    this.webviewMounted = true;
+
     const {
       placeholder,
       defaultValue,
