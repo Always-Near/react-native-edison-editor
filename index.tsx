@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { ViewStyle, View, Text } from "react-native";
+import { ViewStyle, View, Text, Animated } from "react-native";
 import WebView, { WebViewMessageEvent } from "react-native-webview";
 import RNFS from "react-native-fs";
 import { Buffer } from "buffer";
@@ -58,6 +58,7 @@ type PropTypes = {
 class RNDraftView extends Component<PropTypes> {
   private webViewRef = React.createRef<WebView>();
   private webviewMounted: boolean = false;
+  loadingOpacity = new Animated.Value(1);
 
   state = {
     editorState: "",
@@ -164,7 +165,11 @@ class RNDraftView extends Component<PropTypes> {
 
     onEditorReady();
     setTimeout(() => {
-      this.setState({ loading: false });
+      Animated.timing(this.loadingOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
     }, 200);
   };
 
@@ -210,31 +215,32 @@ class RNDraftView extends Component<PropTypes> {
     const { style = { flex: 1 } } = this.props;
     const htmlPath = `file://${RNFS.MainBundlePath}/assets/node_modules/${Package.name}/index.html`;
     return (
-      <View>
+      <>
         <WebView
           ref={this.webViewRef}
           style={style}
+          containerStyle={{ flex: 0, height: "100%" }}
           source={{ uri: htmlPath }}
           keyboardDisplayRequiresUserAction={false}
           originWhitelist={["*"]}
           onMessage={this.onMessage}
           scrollEnabled={false}
         />
-        {this.state.loading && (
-          <View
-            style={{
-              ...style,
-              position: "absolute",
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          ></View>
-        )}
-      </View>
+        <Animated.View
+          style={{
+            ...style,
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: 150,
+            height: 2500,
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: this.loadingOpacity,
+          }}
+          pointerEvents={"none"}
+        ></Animated.View>
+      </>
     );
   }
 }
