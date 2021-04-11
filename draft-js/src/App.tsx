@@ -33,7 +33,7 @@ class App extends React.Component<any, State> {
   constructor(props: any) {
     super(props);
     this.state = {
-      editorState: EdisonUtil.htmlToState(""),
+      editorState: EdisonUtil.stateFromHTML(""),
       placeholder: "",
       style: {},
       isDarkMode: false,
@@ -51,6 +51,7 @@ class App extends React.Component<any, State> {
     window.setIsDarkMode = this.setIsDarkMode;
     window.setEditorPlaceholder = this.setEditorPlaceholder;
     window.onAddAtomicBlock = this.onAddAtomicBlock;
+    window.onAddLink = this.onAddLink;
     window.focusTextEditor = this.focusTextEditor;
     window.blurTextEditor = this.blurTextEditor;
     // add blur event listener
@@ -195,7 +196,7 @@ class App extends React.Component<any, State> {
         const htmlStr = Buffer.from(html, "base64").toString("utf-8");
         // clear the meta to keep style
         const reg = /<meta[^<>]*name="viewport"[^<>]*\/?>/g;
-        const newState = EdisonUtil.htmlToState(htmlStr.replace(reg, ""));
+        const newState = EdisonUtil.stateFromHTML(htmlStr.replace(reg, ""));
         this.setEditorState(newState);
       }
     } catch (e) {
@@ -225,6 +226,23 @@ class App extends React.Component<any, State> {
     try {
       const { type, params } = JSON.parse(paramsStr);
       const newState = EdisonUtil.onAddAtomicBlock(type, params, editorState);
+      this.setEditorState(newState);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  private onAddLink = (paramsStr: string) => {
+    const { editorState } = this.state;
+    try {
+      const { url, text } = JSON.parse(paramsStr);
+      const newState = EdisonUtil.onAddLink(
+        {
+          url,
+          text,
+        },
+        editorState
+      );
       this.setEditorState(newState);
     } catch (err) {
       console.log(err.message);

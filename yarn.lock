@@ -2345,10 +2345,10 @@ duplexify@^3.4.2, duplexify@^3.6.0:
     readable-stream "^2.0.0"
     stream-shift "^1.0.0"
 
-edison-editor@0.10.55:
-  version "0.10.55"
-  resolved "https://registry.yarnpkg.com/edison-editor/-/edison-editor-0.10.55.tgz#8b027b169a943ade509de1390da61a5cfea1c6ff"
-  integrity sha512-poHgR1gkOlk8mcR/v17bek7QWfA8bnOHTcqL/JAGdCKFbgTcMeI8uruKP/ZvtoPGfaoI0AUYpeTC0nefQlpuCg==
+edison-editor@0.10.70:
+  version "0.10.70"
+  resolved "https://registry.yarnpkg.com/edison-editor/-/edison-editor-0.10.70.tgz#857878aa2bc8bd592fc0ba67c1a28d78f9425845"
+  integrity sha512-B+iHXEmvWnRmmnjgmlOGEzZoLy2ujITrqJaYI9DB8NxHwjqcxd1cSjFhuJLYzZDwgjNnRXn4Fo1vOnGzGLRxDQ==
   dependencies:
     "@types/draft-js" "^0.10.44"
     draft-js-export-html "^1.4.1"

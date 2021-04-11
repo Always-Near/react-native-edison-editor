@@ -4,8 +4,9 @@ import WebView, { WebViewMessageEvent } from "react-native-webview";
 import RNFS from "react-native-fs";
 import { Buffer } from "buffer";
 import {
-  AtomicBlockType,
-  AtomicBlockProps,
+  AtomicEntityTypes,
+  AtomicEntityProps,
+  LinkProps,
   InlineStyleType,
 } from "edison-editor";
 import Package from "./package.json";
@@ -13,7 +14,7 @@ import Package from "./package.json";
 import "./index.html";
 
 export type { InlineStyleType } from "edison-editor";
-export type { AtomicBlockType, AtomicBlockProps } from "edison-editor";
+export type { AtomicEntityTypes, AtomicEntityProps } from "edison-editor";
 
 // It must be consistent with `draft-js/src/types.d.ts`
 const InjectScriptName = {
@@ -25,6 +26,7 @@ const InjectScriptName = {
   SetIsDarkMode: "setIsDarkMode",
   SetEditorPlaceholder: "setEditorPlaceholder",
   OnAddAtomicBlock: "onAddAtomicBlock",
+  OnAddLink: "onAddLink",
   FocusTextEditor: "focusTextEditor",
   BlurTextEditor: "blurTextEditor",
 } as const;
@@ -173,14 +175,18 @@ class RNDraftView extends Component<PropTypes> {
     }, 200);
   };
 
-  private onAddAtomicBlock = <T extends AtomicBlockType>(
+  private onAddAtomicBlock = <T extends AtomicEntityTypes>(
     type: T,
-    params: AtomicBlockProps<T>
+    params: AtomicEntityProps<T>
   ) => {
     this.executeScript(
       InjectScriptName.OnAddAtomicBlock,
       JSON.stringify({ type, params })
     );
+  };
+
+  private onAddLink = (params: LinkProps) => {
+    this.executeScript(InjectScriptName.OnAddLink, JSON.stringify(params));
   };
 
   focus = () => {
@@ -204,7 +210,11 @@ class RNDraftView extends Component<PropTypes> {
   };
 
   addImage = (src: string) => {
-    this.onAddAtomicBlock("image", { src });
+    this.onAddAtomicBlock("IMAGE", { src });
+  };
+
+  addLink = (url: string, text: string) => {
+    this.onAddLink({ url, text });
   };
 
   getEditorState = () => {

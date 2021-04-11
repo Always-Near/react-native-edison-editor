@@ -8,6 +8,7 @@ declare interface Window {
   setIsDarkMode: (style: string) => void;
   setEditorPlaceholder: (placeholder: string) => void;
   onAddAtomicBlock: (paramsStr: string) => void;
+  onAddLink: (paramsStr: string) => void;
   focusTextEditor: () => void;
   blurTextEditor: () => void;
 }
