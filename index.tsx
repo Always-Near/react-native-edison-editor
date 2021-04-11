@@ -190,6 +190,12 @@ class RNDraftView extends Component<PropTypes> {
   };
 
   focus = () => {
+    if (!this.webviewMounted) {
+      setTimeout(() => {
+        this.focus();
+      }, 100);
+      return;
+    }
     this.executeScript(InjectScriptName.FocusTextEditor);
   };
 
