@@ -64,6 +64,12 @@ class App extends React.Component<any, State> {
         this.focusTextEditor();
       }, 200);
     };
+
+    // send the size once the intital text has been added
+    setTimeout(
+      () => this.postMessage(EventName.SizeChange, document.body.scrollHeight),
+      200
+    );
   }
 
   private postMessage = (type: string, data: any) => {
