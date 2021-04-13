@@ -284,6 +284,7 @@ class App extends React.Component<any, State> {
             placeholder={placeholder}
             onFocus={this.onFocus}
             onBlur={this.onBlur}
+            spellCheck={true}
           />
         </div>
       </>
