@@ -1,5 +1,12 @@
 import React, { createRef } from "react";
-import { Editor, EditorState, RichUtils, getDefaultKeyBinding } from "draft-js";
+import {
+  Editor,
+  EditorState,
+  RichUtils,
+  getDefaultKeyBinding,
+  convertToRaw,
+  RawDraftContentState,
+} from "draft-js";
 import EdisonEditor, { EdisonUtil } from "edison-editor";
 import { Buffer } from "buffer";
 import "./styles";
@@ -7,6 +14,7 @@ import "./styles";
 const EventName = {
   IsMounted: "isMounted",
   EditorChange: "editorChange",
+  ContentChange: "contentChange",
   ActiveStyleChange: "activeStyleChange",
   SizeChange: "sizeChange",
   EditPosition: "editPosition",
@@ -16,6 +24,8 @@ const EventName = {
 
 type State = {
   editorState: EditorState;
+  defaultContent?: RawDraftContentState;
+  contentIsChange: boolean;
   placeholder: string;
   style: React.CSSProperties;
   isDarkMode: boolean;
@@ -34,6 +44,7 @@ class App extends React.Component<any, State> {
     super(props);
     this.state = {
       editorState: EdisonUtil.stateFromHTML(""),
+      contentIsChange: false,
       placeholder: "",
       style: {},
       isDarkMode: false,
@@ -83,7 +94,25 @@ class App extends React.Component<any, State> {
     }
   };
 
-  private setEditorState = (editorState: EditorState) => {
+  private checkContentIsChange = (editorState: EditorState) => {
+    const { contentIsChange, defaultContent } = this.state;
+    if (contentIsChange) {
+      return;
+    }
+    const newContent = convertToRaw(editorState.getCurrentContent());
+    if (!defaultContent) {
+      this.setState({ defaultContent: newContent });
+      return;
+    }
+    if (JSON.stringify(defaultContent) !== JSON.stringify(newContent)) {
+      this.setState({ contentIsChange: true });
+      this.postMessage(EventName.ContentChange, true);
+    }
+  };
+
+  private setEditorState = (editorState: EditorState, isDefault = false) => {
+    this.checkContentIsChange(editorState);
+
     this.setState({ editorState }, () => {
       this.postMessage(
         EventName.EditorChange,
@@ -203,7 +232,7 @@ class App extends React.Component<any, State> {
         // clear the meta to keep style
         const reg = /<meta[^<>]*name="viewport"[^<>]*\/?>/g;
         const newState = EdisonUtil.stateFromHTML(htmlStr.replace(reg, ""));
-        this.setEditorState(newState);
+        this.setEditorState(newState, true);
       }
     } catch (e) {
       console.error(e);

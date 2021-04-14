@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { ViewStyle, View, Text, Animated } from "react-native";
+import { ViewStyle, Animated } from "react-native";
 import WebView, { WebViewMessageEvent } from "react-native-webview";
 import RNFS from "react-native-fs";
 import { Buffer } from "buffer";
@@ -35,6 +35,7 @@ const InjectScriptName = {
 const EventName = {
   IsMounted: "isMounted",
   EditorChange: "editorChange",
+  ContentChange: "contentChange",
   ActiveStyleChange: "activeStyleChange",
   SizeChange: "sizeChange",
   EditPosition: "editPosition",
@@ -53,6 +54,7 @@ type PropTypes = {
   onSizeChange?: (size: number) => void;
   editPosition?: (pos: number) => void;
   onEditorChange?: (content: string) => void;
+  onContentChange?: () => void;
   onBlur?: () => void;
   onFocus?: () => void;
 };
@@ -101,6 +103,7 @@ class RNDraftView extends Component<PropTypes> {
       onSizeChange,
       onBlur,
       onFocus,
+      onContentChange,
     } = this.props;
     const {
       type,
@@ -135,6 +138,10 @@ class RNDraftView extends Component<PropTypes> {
     }
     if (type === EventName.OnFocus && onFocus) {
       onFocus();
+      return;
+    }
+    if (type === EventName.ContentChange && onContentChange) {
+      onContentChange();
       return;
     }
   };
