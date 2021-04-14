@@ -24,7 +24,7 @@ const EventName = {
 
 type State = {
   editorState: EditorState;
-  defaultContent?: RawDraftContentState;
+  defaultContent: RawDraftContentState;
   contentIsChange: boolean;
   placeholder: string;
   style: React.CSSProperties;
@@ -42,8 +42,11 @@ class App extends React.Component<any, State> {
   _draftEditorRef: React.RefObject<Editor>;
   constructor(props: any) {
     super(props);
+    const editorState = EdisonUtil.stateFromHTML("");
+    const defaultContent = convertToRaw(editorState.getCurrentContent());
     this.state = {
-      editorState: EdisonUtil.stateFromHTML(""),
+      editorState,
+      defaultContent,
       contentIsChange: false,
       placeholder: "",
       style: {},
@@ -75,12 +78,6 @@ class App extends React.Component<any, State> {
         this.focusTextEditor();
       }, 200);
     };
-
-    // send the size once the intital text has been added
-    setTimeout(
-      () => this.postMessage(EventName.SizeChange, document.body.scrollHeight),
-      200
-    );
   }
 
   private postMessage = (type: string, data: any) => {
@@ -94,13 +91,16 @@ class App extends React.Component<any, State> {
     }
   };
 
-  private checkContentIsChange = (editorState: EditorState) => {
+  private checkContentIsChange = (
+    editorState: EditorState,
+    isDefault: boolean
+  ) => {
     const { contentIsChange, defaultContent } = this.state;
     if (contentIsChange) {
       return;
     }
     const newContent = convertToRaw(editorState.getCurrentContent());
-    if (!defaultContent) {
+    if (isDefault) {
       this.setState({ defaultContent: newContent });
       return;
     }
@@ -111,7 +111,7 @@ class App extends React.Component<any, State> {
   };
 
   private setEditorState = (editorState: EditorState, isDefault = false) => {
-    this.checkContentIsChange(editorState);
+    this.checkContentIsChange(editorState, isDefault);
 
     this.setState({ editorState }, () => {
       this.postMessage(
@@ -127,7 +127,7 @@ class App extends React.Component<any, State> {
       const selection = editorState.getSelection();
 
       // only send the scroll position on events when the editor has focus
-      if (selection.getHasFocus()) {
+      if (selection.getHasFocus() || isDefault) {
         setTimeout(() => {
           this.postMessage(EventName.SizeChange, document.body.scrollHeight);
 
