@@ -79,3 +79,6 @@ img.fullwidth {
     background-color: #111112;
   }
 }
+a {
+  pointer-events:none!important;
+}
