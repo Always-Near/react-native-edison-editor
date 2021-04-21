@@ -6,6 +6,7 @@ import {
   getDefaultKeyBinding,
   convertToRaw,
   RawDraftContentState,
+  SelectionState,
 } from "draft-js";
 import EdisonEditor, { EdisonUtil } from "edison-editor";
 import { Buffer } from "buffer";
@@ -20,6 +21,8 @@ const EventName = {
   EditPosition: "editPosition",
   OnFocus: "onFocus",
   OnBlur: "onBlur",
+  OnPastedFiles: "onPastedFiles",
+  OnDroppedFiles: "onDroppedFiles",
 } as const;
 
 type State = {
@@ -300,6 +303,52 @@ class App extends React.Component<any, State> {
     this.postMessage(EventName.OnBlur, true);
   };
 
+  private readBlob = (blob: Blob) => {
+    return new Promise<string>((resolve, reject) => {
+      var reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onload = function (e) {
+        resolve((e.target?.result || "") as string);
+      };
+    });
+  };
+
+  private onReceiveFiles = async (files: any[]) => {
+    const data = [];
+    for (const file of files) {
+      const fileDataString = await this.readBlob(file);
+      data.push({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        data: fileDataString,
+      });
+    }
+    this.postMessage(EventName.OnPastedFiles, JSON.stringify(data));
+  };
+
+  private onPastedFiles = (files: Blob[]) => {
+    this.onReceiveFiles(files);
+    return "handled" as const;
+  };
+
+  private onDroppedFiles = (selection: SelectionState, files: any[]) => {
+    this.postMessage(
+      EventName.OnDroppedFiles,
+      JSON.stringify(
+        files.map((file) => {
+          return {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            data: "",
+          };
+        })
+      )
+    );
+    return "handled" as const;
+  };
+
   render() {
     const { placeholder, editorState, style, isDarkMode } = this.state;
 
@@ -320,6 +369,8 @@ class App extends React.Component<any, State> {
             onFocus={this.onFocus}
             onBlur={this.onBlur}
             spellCheck={true}
+            handlePastedFiles={this.onPastedFiles}
+            handleDroppedFiles={this.onDroppedFiles}
           />
         </div>
       </>

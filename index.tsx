@@ -41,7 +41,16 @@ const EventName = {
   EditPosition: "editPosition",
   OnFocus: "onFocus",
   OnBlur: "onBlur",
+  OnPastedFiles: "onPastedFiles",
+  OnDroppedFiles: "onDroppedFiles",
 } as const;
+
+type File = {
+  name: string;
+  size: number;
+  type: string;
+  data: string;
+};
 
 type PropTypes = {
   style?: ViewStyle;
@@ -55,6 +64,8 @@ type PropTypes = {
   editPosition?: (pos: number) => void;
   onEditorChange?: (content: string) => void;
   onContentChange?: () => void;
+  onPastedFiles?: (files: File[]) => void;
+  onDroppedFiles?: (files: File[]) => void;
   onBlur?: () => void;
   onFocus?: () => void;
 };
@@ -104,6 +115,8 @@ class RNDraftView extends Component<PropTypes> {
       onBlur,
       onFocus,
       onContentChange,
+      onPastedFiles,
+      onDroppedFiles,
     } = this.props;
     const {
       type,
@@ -142,6 +155,14 @@ class RNDraftView extends Component<PropTypes> {
     }
     if (type === EventName.ContentChange && onContentChange) {
       onContentChange();
+      return;
+    }
+    if (type === EventName.OnPastedFiles && onPastedFiles) {
+      onPastedFiles(data);
+      return;
+    }
+    if (type === EventName.OnDroppedFiles && onDroppedFiles) {
+      onDroppedFiles(data);
       return;
     }
   };
