@@ -16,6 +16,23 @@ import "./index.html";
 export type { InlineStyleType } from "edison-editor";
 export type { AtomicEntityTypes, AtomicEntityProps } from "edison-editor";
 
+let draftJsFilePath = `${RNFS.CachesDirectoryPath}/draftjs.html`;
+const htmlPath = `file://${RNFS.MainBundlePath}/assets/node_modules/${Package.name}/index.html`;
+
+async function copyFile() {
+  try {
+    if (RNFS.exists(draftJsFilePath)) {
+      await RNFS.unlink(draftJsFilePath);
+    }
+    await RNFS.copyFile(htmlPath, draftJsFilePath);
+  } catch (err) {
+    // badcase remedy
+    draftJsFilePath = htmlPath;
+  }
+}
+
+copyFile();
+
 // It must be consistent with `draft-js/src/types.d.ts`
 const InjectScriptName = {
   ToggleBlockType: "toggleBlockType",
@@ -257,14 +274,14 @@ class RNDraftView extends Component<PropTypes> {
 
   render() {
     const { style = { flex: 1 } } = this.props;
-    const htmlPath = `file://${RNFS.MainBundlePath}/assets/node_modules/${Package.name}/index.html`;
     return (
       <>
         <WebView
           ref={this.webViewRef}
           style={style}
           containerStyle={{ flex: 0, height: "100%" }}
-          source={{ uri: htmlPath }}
+          source={{ uri: draftJsFilePath }}
+          allowingReadAccessToURL={"file://"}
           keyboardDisplayRequiresUserAction={false}
           originWhitelist={["*"]}
           onMessage={this.onMessage}
