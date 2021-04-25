@@ -21,7 +21,8 @@ const htmlPath = `file://${RNFS.MainBundlePath}/assets/node_modules/${Package.na
 
 async function copyFile() {
   try {
-    if (RNFS.exists(draftJsFilePath)) {
+    const fileHasExists = await RNFS.exists(draftJsFilePath);
+    if (fileHasExists) {
       await RNFS.unlink(draftJsFilePath);
     }
     await RNFS.copyFile(htmlPath, draftJsFilePath);
