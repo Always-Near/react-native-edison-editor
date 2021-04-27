@@ -45,8 +45,7 @@ img.fullwidth {
   color: #1f9aff;
 }
 .edo-transform {
-  transform-origin-x: 0px;
-  transform-origin-y: 0px;
+  transform-origin: 0px 0px;
 }
 .x-apple-signature {
   margin-top: 15px;
