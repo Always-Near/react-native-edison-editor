@@ -169,7 +169,6 @@ class App extends React.Component<any, State> {
   private onBackSpace = (editorState: EditorState) => {
     if (EdisonUtil.isInIndentBlockBeginning(editorState)) {
       this.setEditorState(EdisonUtil.indentDecrease(editorState));
-      return "handled";
     }
     return this.onNormalCommand("backspace", editorState);
   };
