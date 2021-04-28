@@ -369,6 +369,7 @@ class App extends React.Component<any, State> {
             onFocus={this.onFocus}
             onBlur={this.onBlur}
             spellCheck={true}
+            autoCapitalize={"on"}
             handlePastedFiles={this.onPastedFiles}
             handleDroppedFiles={this.onDroppedFiles}
           />

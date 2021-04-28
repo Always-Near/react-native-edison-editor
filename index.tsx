@@ -10,7 +10,10 @@ import {
   InlineStyleType,
 } from "edison-editor";
 import Package from "./package.json";
-
+import {
+  WebViewErrorEvent,
+  WebViewError,
+} from "react-native-webview/lib/WebViewTypes";
 import "./index.html";
 
 export type { InlineStyleType } from "edison-editor";
@@ -86,6 +89,7 @@ type PropTypes = {
   onDroppedFiles?: (files: File[]) => void;
   onBlur?: () => void;
   onFocus?: () => void;
+  onError?: (error: WebViewError) => void;
 };
 
 class RNDraftView extends Component<PropTypes> {
@@ -182,6 +186,12 @@ class RNDraftView extends Component<PropTypes> {
     if (type === EventName.OnDroppedFiles && onDroppedFiles) {
       onDroppedFiles(data);
       return;
+    }
+  };
+
+  private onError = (event: WebViewErrorEvent) => {
+    if (this.props.onError) {
+      this.props.onError(event.nativeEvent);
     }
   };
 
@@ -286,6 +296,7 @@ class RNDraftView extends Component<PropTypes> {
           keyboardDisplayRequiresUserAction={false}
           originWhitelist={["*"]}
           onMessage={this.onMessage}
+          onError={this.onError}
           scrollEnabled={false}
         />
         <Animated.View
