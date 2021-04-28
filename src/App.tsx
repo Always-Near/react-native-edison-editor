@@ -27,7 +27,6 @@ const EventName = {
 
 type State = {
   editorState: EditorState;
-  defaultContent: RawDraftContentState;
   contentIsChange: boolean;
   placeholder: string;
   style: React.CSSProperties;
@@ -46,10 +45,8 @@ class App extends React.Component<any, State> {
   constructor(props: any) {
     super(props);
     const editorState = EdisonUtil.stateFromHTML("");
-    const defaultContent = convertToRaw(editorState.getCurrentContent());
     this.state = {
       editorState,
-      defaultContent,
       contentIsChange: false,
       placeholder: "",
       style: {},
@@ -94,28 +91,17 @@ class App extends React.Component<any, State> {
     }
   };
 
-  private checkContentIsChange = (
-    editorState: EditorState,
-    isDefault: boolean
-  ) => {
-    const { contentIsChange, defaultContent } = this.state;
+  private checkContentIsChange = () => {
+    const { contentIsChange } = this.state;
     if (contentIsChange) {
       return;
     }
-    const newContent = convertToRaw(editorState.getCurrentContent());
-    if (isDefault) {
-      this.setState({ defaultContent: newContent });
-      return;
-    }
-    if (JSON.stringify(defaultContent) !== JSON.stringify(newContent)) {
-      this.setState({ contentIsChange: true });
-      this.postMessage(EventName.ContentChange, true);
-    }
+
+    this.setState({ contentIsChange: true });
+    this.postMessage(EventName.ContentChange, true);
   };
 
   private setEditorState = (editorState: EditorState, isDefault = false) => {
-    this.checkContentIsChange(editorState, isDefault);
-
     this.setState({ editorState }, () => {
       this.postMessage(
         EventName.EditorChange,
@@ -190,6 +176,9 @@ class App extends React.Component<any, State> {
   };
 
   private mapKeyToEditorCommand = (e: React.KeyboardEvent) => {
+    // on keyboard mean that content is changed
+    this.checkContentIsChange();
+
     if (e.code === "Tab") {
       e.stopPropagation();
       e.preventDefault();
@@ -323,7 +312,7 @@ class App extends React.Component<any, State> {
         data: fileDataString,
       });
     }
-    this.postMessage(EventName.OnPastedFiles, JSON.stringify(data));
+    this.postMessage(EventName.OnPastedFiles, data);
   };
 
   private onPastedFiles = (files: Blob[]) => {
@@ -334,16 +323,14 @@ class App extends React.Component<any, State> {
   private onDroppedFiles = (selection: SelectionState, files: any[]) => {
     this.postMessage(
       EventName.OnDroppedFiles,
-      JSON.stringify(
-        files.map((file) => {
-          return {
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            data: "",
-          };
-        })
-      )
+      files.map((file) => {
+        return {
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          data: "",
+        };
+      })
     );
     return "handled" as const;
   };

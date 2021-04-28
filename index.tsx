@@ -66,7 +66,7 @@ const EventName = {
   OnDroppedFiles: "onDroppedFiles",
 } as const;
 
-type File = {
+export type File = {
   name: string;
   size: number;
   type: string;
@@ -140,53 +140,55 @@ class RNDraftView extends Component<PropTypes> {
       onPastedFiles,
       onDroppedFiles,
     } = this.props;
-    const {
-      type,
-      data,
-    }: {
-      type: typeof EventName[keyof typeof EventName];
-      data: any;
-    } = JSON.parse(event.nativeEvent.data);
-    if (type === EventName.IsMounted) {
-      this.widgetMounted();
-      return;
-    }
-    if (type === EventName.EditorChange) {
-      onEditorChange && onEditorChange(data.replace(/(\r\n|\n|\r)/gm, ""));
-      this.setState({ editorState: data.replace(/(\r\n|\n|\r)/gm, "") });
-      return;
-    }
-    if (type === EventName.ActiveStyleChange) {
-      onActiveStyleChange && onActiveStyleChange(data);
-    }
-    if (type === EventName.EditPosition && editPosition) {
-      editPosition(data);
-      return;
-    }
-    if (type === EventName.SizeChange && onSizeChange) {
-      onSizeChange(data);
-      return;
-    }
-    if (type === EventName.OnBlur && onBlur) {
-      onBlur();
-      return;
-    }
-    if (type === EventName.OnFocus && onFocus) {
-      onFocus();
-      return;
-    }
-    if (type === EventName.ContentChange && onContentChange) {
-      onContentChange();
-      return;
-    }
-    if (type === EventName.OnPastedFiles && onPastedFiles) {
-      onPastedFiles(data);
-      return;
-    }
-    if (type === EventName.OnDroppedFiles && onDroppedFiles) {
-      onDroppedFiles(data);
-      return;
-    }
+    try {
+      const {
+        type,
+        data,
+      }: {
+        type: typeof EventName[keyof typeof EventName];
+        data: any;
+      } = JSON.parse(event.nativeEvent.data);
+      if (type === EventName.IsMounted) {
+        this.widgetMounted();
+        return;
+      }
+      if (type === EventName.EditorChange) {
+        onEditorChange && onEditorChange(data.replace(/(\r\n|\n|\r)/gm, ""));
+        this.setState({ editorState: data.replace(/(\r\n|\n|\r)/gm, "") });
+        return;
+      }
+      if (type === EventName.ActiveStyleChange) {
+        onActiveStyleChange && onActiveStyleChange(data);
+      }
+      if (type === EventName.EditPosition && editPosition) {
+        editPosition(data);
+        return;
+      }
+      if (type === EventName.SizeChange && onSizeChange) {
+        onSizeChange(data);
+        return;
+      }
+      if (type === EventName.OnBlur && onBlur) {
+        onBlur();
+        return;
+      }
+      if (type === EventName.OnFocus && onFocus) {
+        onFocus();
+        return;
+      }
+      if (type === EventName.ContentChange && onContentChange) {
+        onContentChange();
+        return;
+      }
+      if (type === EventName.OnPastedFiles && onPastedFiles) {
+        onPastedFiles(data as File[]);
+        return;
+      }
+      if (type === EventName.OnDroppedFiles && onDroppedFiles) {
+        onDroppedFiles(data as File[]);
+        return;
+      }
+    } catch (err) {}
   };
 
   private onError = (event: WebViewErrorEvent) => {
