@@ -221,7 +221,7 @@ class App extends React.Component<any, State> {
       if (html) {
         const htmlStr = Buffer.from(html, "base64").toString("utf-8");
         // clear the meta to keep style
-        const reg = /<meta[^<>]*name="viewport"[^<>]*\/?>/g;
+        const reg = /<meta\s+name=(['"\s]?)viewport\1\s+content=[^>]*>/gi;
         const newState = EdisonUtil.stateFromHTML(htmlStr.replace(reg, ""));
         this.setEditorState(newState, true);
       }
