@@ -294,10 +294,10 @@ class App extends React.Component<any, State> {
   private readBlob = (blob: Blob) => {
     return new Promise<string>((resolve, reject) => {
       var reader = new FileReader();
-      reader.readAsDataURL(blob);
       reader.onload = function (e) {
         resolve((e.target?.result || "") as string);
       };
+      reader.readAsDataURL(blob);
     });
   };
 

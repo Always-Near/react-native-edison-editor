@@ -95,6 +95,7 @@ type PropTypes = {
 class RNDraftView extends Component<PropTypes> {
   private webViewRef = React.createRef<WebView>();
   private webviewMounted: boolean = false;
+  private focusTimeout: NodeJS.Timeout | null = null;
   loadingOpacity = new Animated.Value(1);
 
   state = {
@@ -248,8 +249,11 @@ class RNDraftView extends Component<PropTypes> {
   };
 
   focus = () => {
+    if (this.focusTimeout) {
+      clearTimeout(this.focusTimeout);
+    }
     if (!this.webviewMounted) {
-      setTimeout(() => {
+      this.focusTimeout = setTimeout(() => {
         this.focus();
       }, 100);
       return;
@@ -298,6 +302,7 @@ class RNDraftView extends Component<PropTypes> {
           keyboardDisplayRequiresUserAction={false}
           originWhitelist={["*"]}
           onMessage={this.onMessage}
+          contentMode={"mobile"}
           onError={this.onError}
           scrollEnabled={false}
         />
