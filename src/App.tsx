@@ -22,6 +22,7 @@ const EventName = {
   OnFocus: "onFocus",
   OnBlur: "onBlur",
   OnPastedFiles: "onPastedFiles",
+  OnPastedLocalFiles: "onPastedLocalFiles",
   OnDroppedFiles: "onDroppedFiles",
 } as const;
 
@@ -315,9 +316,39 @@ class App extends React.Component<any, State> {
     this.postMessage(EventName.OnPastedFiles, data);
   };
 
+  private onReceiveLocalFiles = async (filePaths: string[]) => {
+    this.postMessage(EventName.OnPastedLocalFiles, filePaths);
+  };
+
   private onPastedFiles = (files: Blob[]) => {
     this.onReceiveFiles(files);
     return "handled" as const;
+  };
+
+  private handlePastedText = (text: string, html?: string) => {
+    if (!html) {
+      const urlReg = /^(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]$/;
+      if (urlReg.test(text)) {
+        // pass
+        return "not-handled" as const;
+      } else {
+        return "not-handled" as const;
+      }
+    }
+    const imgReg = /<img[^>]+src\s*=['"\s]?(?<url>[^>]+?)['"]?\s+[^>]*>/gi;
+    const paths: string[] = [];
+    let res = imgReg.exec(html);
+    while (res) {
+      const localFilePath = res.groups?.url;
+      if (localFilePath && localFilePath.startsWith("http")) {
+        paths.push(localFilePath);
+      }
+      res = imgReg.exec(html);
+    }
+    if (paths.length) {
+      this.onReceiveLocalFiles(paths);
+    }
+    return "not-handled" as const;
   };
 
   private onDroppedFiles = (selection: SelectionState, files: any[]) => {
@@ -356,6 +387,7 @@ class App extends React.Component<any, State> {
             onBlur={this.onBlur}
             spellCheck={true}
             autoCapitalize={"on"}
+            handlePastedText={this.handlePastedText}
             handlePastedFiles={this.onPastedFiles}
             handleDroppedFiles={this.onDroppedFiles}
           />
