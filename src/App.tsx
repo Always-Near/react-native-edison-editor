@@ -192,6 +192,8 @@ class App extends React.Component<any, State> {
   // publish functions
 
   private toggleSpecialType = (command: string) => {
+    // toggleSpecialType mean that content is changed
+    this.checkContentIsChange();
     const { editorState } = this.state;
     if (command === "CLEAR") {
       this.setEditorState(EdisonUtil.clearAllInlineStyle(editorState));
@@ -208,11 +210,15 @@ class App extends React.Component<any, State> {
   };
 
   private toggleBlockType = (blockType: string) => {
+    // toggleBlockType mean that content is changed
+    this.checkContentIsChange();
     const { editorState } = this.state;
     this.setEditorState(RichUtils.toggleBlockType(editorState, blockType));
   };
 
   private toggleInlineStyle = (inlineStyle: string) => {
+    // toggleInlineStyle mean that content is changed
+    this.checkContentIsChange();
     const { editorState } = this.state;
     this.setEditorState(RichUtils.toggleInlineStyle(editorState, inlineStyle));
   };
@@ -249,6 +255,8 @@ class App extends React.Component<any, State> {
   };
 
   private onAddAtomicBlock = (paramsStr: string) => {
+    // onAddAtomicBlock mean that content is changed
+    this.checkContentIsChange();
     const { editorState } = this.state;
     try {
       const { type, params } = JSON.parse(paramsStr);
@@ -260,6 +268,8 @@ class App extends React.Component<any, State> {
   };
 
   private onAddLink = (paramsStr: string) => {
+    // onAddLink mean that content is changed
+    this.checkContentIsChange();
     const { editorState } = this.state;
     try {
       const { url, text } = JSON.parse(paramsStr);
