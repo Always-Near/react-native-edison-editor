@@ -118,6 +118,15 @@ class RNDraftView extends Component<PropTypes> {
         nextProps.isDarkMode.toString()
       );
     }
+    if (
+      nextProps.defaultValue &&
+      nextProps.defaultValue !== this.props.defaultValue
+    ) {
+      const formatHtml = Buffer.from(nextProps.defaultValue, "utf-8").toString(
+        "base64"
+      );
+      this.executeScript(InjectScriptName.SetDefaultValue, formatHtml);
+    }
   };
 
   private executeScript = (
