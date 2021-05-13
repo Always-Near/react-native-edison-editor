@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { ViewStyle, Animated } from "react-native";
+import { ViewStyle, Animated, Platform } from "react-native";
 import WebView, { WebViewMessageEvent } from "react-native-webview";
 import RNFS from "react-native-fs";
 import { Buffer } from "buffer";
@@ -19,19 +19,49 @@ import "./index.html";
 export type { InlineStyleType } from "edison-editor";
 export type { AtomicEntityTypes, AtomicEntityProps } from "edison-editor";
 
-let draftJsFilePath = `${RNFS.CachesDirectoryPath}/draftjs.html`;
-const htmlPath = `file://${RNFS.MainBundlePath}/assets/node_modules/${Package.name}/index.html`;
+const draftJsFileTargetPath = `file://${RNFS.CachesDirectoryPath}/draftjs.html`;
+let draftJsFilePath = draftJsFileTargetPath;
 
-async function copyFile() {
+async function copyFileForIos() {
+  const htmlPath = `file://${RNFS.MainBundlePath}/assets/node_modules/${Package.name}/index.html`;
   try {
-    const fileHasExists = await RNFS.exists(draftJsFilePath);
+    const fileHasExists = await RNFS.exists(draftJsFileTargetPath);
     if (fileHasExists) {
-      await RNFS.unlink(draftJsFilePath);
+      await RNFS.unlink(draftJsFileTargetPath);
     }
-    await RNFS.copyFile(htmlPath, draftJsFilePath);
+    await RNFS.copyFile(htmlPath, draftJsFileTargetPath);
+    return draftJsFileTargetPath;
   } catch (err) {
     // badcase remedy
-    draftJsFilePath = htmlPath;
+    return htmlPath;
+  }
+}
+
+async function copyFileForAndroid() {
+  const htmlResPath = `raw/node_modules_${Package.name.replace(
+    /-/g,
+    ""
+  )}_index.html`;
+  try {
+    const fileHasExists = await RNFS.exists(draftJsFileTargetPath);
+    if (fileHasExists) {
+      await RNFS.unlink(draftJsFileTargetPath);
+    }
+    await RNFS.copyFileRes(htmlResPath, draftJsFileTargetPath);
+    return draftJsFileTargetPath;
+  } catch (err) {
+    // badcase remedy
+    return `file:///android_res/${htmlResPath}`;
+  }
+}
+
+async function copyFile() {
+  if (Platform.OS === "ios") {
+    const filePath = await copyFileForIos();
+    draftJsFilePath = filePath;
+  } else if (Platform.OS === "android") {
+    const filePath = await copyFileForAndroid();
+    draftJsFilePath = filePath;
   }
 }
 
@@ -94,16 +124,26 @@ type PropTypes = {
   onError?: (error: WebViewError) => void;
 };
 
-class RNDraftView extends Component<PropTypes> {
+type DraftViewState = {
+  webviewUri: string;
+  editorState: string;
+  loading: boolean;
+};
+
+class RNDraftView extends Component<PropTypes, DraftViewState> {
   private webViewRef = React.createRef<WebView>();
   private webviewMounted: boolean = false;
   private focusTimeout: NodeJS.Timeout | null = null;
   loadingOpacity = new Animated.Value(1);
 
-  state = {
-    editorState: "",
-    loading: true,
-  };
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      webviewUri: "",
+      editorState: "",
+      loading: true,
+    };
+  }
 
   UNSAFE_componentWillReceiveProps = (nextProps: PropTypes) => {
     if (!this.webviewMounted) {
@@ -313,7 +353,8 @@ class RNDraftView extends Component<PropTypes> {
           ref={this.webViewRef}
           style={style}
           containerStyle={{ flex: 0, height: "100%" }}
-          source={{ uri: draftJsFilePath }}
+          source={{ uri: this.state.webviewUri }}
+          allowFileAccess
           allowingReadAccessToURL={"file://"}
           keyboardDisplayRequiresUserAction={false}
           originWhitelist={["*"]}
