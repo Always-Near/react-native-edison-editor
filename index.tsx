@@ -145,6 +145,10 @@ class RNDraftView extends Component<PropTypes, DraftViewState> {
     };
   }
 
+  componentDidMount() {
+    this.setState({ webviewUri: draftJsFilePath });
+  }
+
   UNSAFE_componentWillReceiveProps = (nextProps: PropTypes) => {
     if (!this.webviewMounted) {
       return;
