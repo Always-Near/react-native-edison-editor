@@ -356,7 +356,6 @@ class RNDraftView extends Component<PropTypes, DraftViewState> {
         <WebView
           ref={this.webViewRef}
           style={style}
-          containerStyle={{ flex: 0, height: "100%" }}
           source={{ uri: this.state.webviewUri }}
           allowFileAccess
           allowingReadAccessToURL={"file://"}
