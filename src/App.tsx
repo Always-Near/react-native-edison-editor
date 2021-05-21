@@ -8,7 +8,11 @@ import {
   RawDraftContentState,
   SelectionState,
 } from "draft-js";
-import EdisonEditor, { EdisonUtil } from "edison-editor";
+import EdisonEditor, {
+  EdisonUtil,
+  EventListener,
+  EventMap,
+} from "edison-editor";
 import { Buffer } from "buffer";
 import "./styles";
 
@@ -79,6 +83,9 @@ class App extends React.Component<any, State> {
         this.focusTextEditor();
       }, 200);
     };
+    EventListener.addEventListener(EventMap.ImgOnload, () => {
+      this.postMessage(EventName.SizeChange, document.body.scrollHeight);
+    });
   }
 
   private postMessage = (type: string, data: any) => {
@@ -337,7 +344,8 @@ class App extends React.Component<any, State> {
 
   private handlePastedText = (text: string, html?: string) => {
     if (!html) {
-      const urlReg = /^(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]$/;
+      const urlReg =
+        /^(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]$/;
       if (urlReg.test(text)) {
         // pass
         return "not-handled" as const;
