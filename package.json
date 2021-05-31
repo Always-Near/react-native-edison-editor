@@ -5,7 +5,7 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "dev": "webpack serve -c ./config/webpack.dev.js",
+    "dev": "webpack serve -c ./config/webpack.dev.js --host 0.0.0.0",
     "build": "webpack -c ./config/webpack.pro.js && yarn tsc"
   },
   "homepage": "https://github.com/Always-Near/react-native-edison-editor.git",
