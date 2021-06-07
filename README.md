@@ -13,20 +13,19 @@
 #### 2. run react app
 
 - `yarn dev` to start react app in localhost
+- or `yarn dev-with-host` to start in host and can visit it in other device by IP address
 
 #### 3. change webview uri
 
 change the code in file `{your project}/node_modules/react-native-edison-editor/index.js`
 
-```
-var htmlPath = "file://" + RNFS.MainBundlePath + "/assets/node_modules/" + Package.name + "/index.html";
-```
-
-to:
+find this code:
 
 ```
-var htmlPath = "http://localhost:8080/"
+this.setState({ webviewUri: draftJsFilePath });
 ```
+
+change the webviewUri to your local url: `http://localhost:8080` or `http://192.168.1.123:8080`
 
 #### 4. finish change and build
 
