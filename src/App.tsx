@@ -86,6 +86,13 @@ class App extends React.Component<any, State> {
     EventListener.addEventListener(EventMap.ImgOnload, () => {
       this.postMessage(EventName.SizeChange, document.body.scrollHeight);
     });
+    // auto focus when click html
+    document.addEventListener("click", (e) => {
+      const clickDom = e.target as Element | null;
+      if (clickDom?.tagName === "HTML") {
+        this.focusTextEditor();
+      }
+    });
   }
 
   private postMessage = (type: string, data: any) => {
