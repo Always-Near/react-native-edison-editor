@@ -40,7 +40,6 @@ type State = {
 
 const darkModeStyle = `
   :root {
-    background-color: #fefefe;
     filter: invert(100%);
   }
 `;
