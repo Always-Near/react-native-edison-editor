@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { ViewStyle, Animated, Platform } from "react-native";
+import { ViewStyle, Animated, Platform, TextInput } from "react-native";
 import WebView, { WebViewMessageEvent } from "react-native-webview";
 import RNFS from "react-native-fs";
 import { Buffer } from "buffer";
@@ -132,8 +132,10 @@ type DraftViewState = {
 
 class RNDraftView extends Component<PropTypes, DraftViewState> {
   private webViewRef = React.createRef<WebView>();
+  private textInputRef = React.createRef<TextInput>();
   private webviewMounted: boolean = false;
   private focusTimeout: NodeJS.Timeout | null = null;
+  private isAndroid = Platform.OS === "android";
   loadingOpacity = new Animated.Value(1);
 
   constructor(props: any) {
@@ -318,12 +320,12 @@ class RNDraftView extends Component<PropTypes, DraftViewState> {
       }, 100);
       return;
     }
-
-    // android must focus webview first
-    if (Platform.OS === "android") {
+    if (this.isAndroid) {
+      // focus the textinput to wake up the keyborad
+      this.textInputRef.current?.focus();
+      // android must focus webview first
       this.webViewRef.current?.requestFocus();
     }
-
     this.executeScript(InjectScriptName.FocusTextEditor);
   };
 
@@ -372,6 +374,18 @@ class RNDraftView extends Component<PropTypes, DraftViewState> {
           onError={this.onError}
           scrollEnabled={false}
         />
+        {this.isAndroid ? (
+          <TextInput
+            ref={this.textInputRef}
+            style={{
+              height: 0,
+              width: 0,
+              position: "absolute",
+              left: -1000,
+              backgroundColor: "transparent",
+            }}
+          />
+        ) : null}
         <Animated.View
           style={{
             ...style,
