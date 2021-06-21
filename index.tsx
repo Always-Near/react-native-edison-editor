@@ -131,10 +131,10 @@ type DraftViewState = {
 };
 
 class RNDraftView extends Component<PropTypes, DraftViewState> {
+  timeoutMap: Map<string, NodeJS.Timeout> = new Map();
+  webviewMounted: boolean = false;
   private webViewRef = React.createRef<WebView>();
   private textInputRef = React.createRef<TextInput>();
-  private webviewMounted: boolean = false;
-  private focusTimeout: NodeJS.Timeout | null = null;
   private isAndroid = Platform.OS === "android";
   loadingOpacity = new Animated.Value(1);
 
@@ -179,11 +179,27 @@ class RNDraftView extends Component<PropTypes, DraftViewState> {
     functionName: typeof InjectScriptName[keyof typeof InjectScriptName],
     parameter?: string
   ) => {
-    if (this.webViewRef.current) {
-      this.webViewRef.current.injectJavaScript(
-        `window.${functionName}(${parameter ? `'${parameter}'` : ""});true;`
-      );
+    if (!this.webViewRef.current) {
+      return;
     }
+    const timeout = this.timeoutMap.get(functionName);
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    if (!this.webviewMounted) {
+      this.timeoutMap.set(
+        functionName,
+        setTimeout(() => {
+          this.executeScript(functionName, parameter);
+        }, 100)
+      );
+      return;
+    }
+    this.webViewRef.current.injectJavaScript(
+      `window.${functionName} && window.${functionName}(${
+        parameter ? `'${parameter}'` : ""
+      });true;`
+    );
   };
 
   private onMessage = (event: WebViewMessageEvent) => {
@@ -311,15 +327,6 @@ class RNDraftView extends Component<PropTypes, DraftViewState> {
   };
 
   focus = () => {
-    if (this.focusTimeout) {
-      clearTimeout(this.focusTimeout);
-    }
-    if (!this.webviewMounted) {
-      this.focusTimeout = setTimeout(() => {
-        this.focus();
-      }, 100);
-      return;
-    }
     if (this.isAndroid) {
       // focus the textinput to wake up the keyborad
       this.textInputRef.current?.focus();
