@@ -135,7 +135,6 @@ class RNDraftView extends Component<PropTypes, DraftViewState> {
   webviewMounted: boolean = false;
   private webViewRef = React.createRef<WebView>();
   private textInputRef = React.createRef<TextInput>();
-  private isAndroid = Platform.OS === "android";
   loadingOpacity = new Animated.Value(1);
 
   constructor(props: any) {
@@ -327,7 +326,8 @@ class RNDraftView extends Component<PropTypes, DraftViewState> {
   };
 
   focus = () => {
-    if (this.isAndroid) {
+    // android10 has bug for requestFocus
+    if (Platform.OS === "android" && Platform.Version !== 29) {
       // focus the textinput to wake up the keyborad
       this.textInputRef.current?.focus();
       // android must focus webview first
@@ -381,7 +381,7 @@ class RNDraftView extends Component<PropTypes, DraftViewState> {
           onError={this.onError}
           scrollEnabled={false}
         />
-        {this.isAndroid ? (
+        {Platform.OS === "android" ? (
           <TextInput
             ref={this.textInputRef}
             style={{
