@@ -28,7 +28,6 @@ const EventName = {
   OnPastedFiles: "onPastedFiles",
   OnPastedLocalFiles: "onPastedLocalFiles",
   OnDroppedFiles: "onDroppedFiles",
-  Debugger: "debugger",
 } as const;
 
 type State = {
@@ -93,15 +92,6 @@ class App extends React.Component<any, State> {
         this.focusTextEditor();
       }
     });
-
-    // onCompositionend has bug in draftjs, so remove it in draftjs
-    const editorContent = document.querySelector(".public-DraftEditor-content");
-    if (editorContent) {
-      editorContent.addEventListener("compositionend", (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-      });
-    }
   }
 
   private postMessage = (type: string, data: any) => {
