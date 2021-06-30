@@ -1,11 +1,9 @@
-import React, { createRef } from "react";
+import { Buffer } from "buffer";
 import {
   Editor,
   EditorState,
-  RichUtils,
   getDefaultKeyBinding,
-  convertToRaw,
-  RawDraftContentState,
+  RichUtils,
   SelectionState,
 } from "draft-js";
 import EdisonEditor, {
@@ -13,7 +11,7 @@ import EdisonEditor, {
   EventListener,
   EventMap,
 } from "edison-editor";
-import { Buffer } from "buffer";
+import React, { createRef } from "react";
 import "./styles";
 
 const EventName = {
@@ -92,6 +90,22 @@ class App extends React.Component<any, State> {
         this.focusTextEditor();
       }
     });
+
+    // This is a bug for draftjs,It doesn't handle the pasting URL.
+    // https://github.com/facebook/draft-js/blob/master/src/component/handlers/edit/editOnPaste.js
+    // The url is in  data.getLink(), but it only handle the data.getFiles(), data.getText(),data.getHTML()
+    const container = document.querySelector(".public-DraftEditor-content");
+    if (container) {
+      container.addEventListener("paste", (e: any) => {
+        const clipboardData = e.clipboardData;
+        const url = clipboardData.getData("url");
+        if (url) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.onPastedUrl(url);
+        }
+      });
+    }
   }
 
   private postMessage = (type: string, data: any) => {
@@ -348,16 +362,27 @@ class App extends React.Component<any, State> {
     return "handled" as const;
   };
 
+  private onPastedUrl = (url: string) => {
+    const { editorState } = this.state;
+    const newState = EdisonUtil.onAddLink(
+      {
+        url,
+        text: url,
+      },
+      editorState
+    );
+    this.setEditorState(newState);
+  };
+
   private handlePastedText = (text: string, html?: string) => {
     if (!html) {
       const urlReg =
         /^(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]$/;
       if (urlReg.test(text)) {
-        // pass
-        return "not-handled" as const;
-      } else {
-        return "not-handled" as const;
+        this.onPastedUrl(text);
+        return "handled" as const;
       }
+      return "not-handled" as const;
     }
     const imgReg = /<img[^>]+src\s*=['"\s]?(?<url>[^>]+?)['"]?\s+[^>]*>/gi;
     const paths: string[] = [];
