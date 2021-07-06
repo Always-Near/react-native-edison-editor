@@ -333,8 +333,7 @@ class RNDraftView extends Component<PropTypes, DraftViewState> {
 
   focus = () => {
     this.doSomethingAfterMounted(`focusAndShowKeyboard`, () => {
-      // android10 has bug for requestFocus
-      if (Platform.OS === "android" && Platform.Version !== 29) {
+      if (Platform.OS === "android") {
         // focus the textinput to wake up the keyborad
         this.textInputRef.current?.focus();
         // android must focus webview first
