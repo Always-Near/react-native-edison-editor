@@ -247,7 +247,7 @@ class App extends React.Component<any, State> {
     // toggleInlineStyle mean that content is changed
     this.checkContentIsChange();
     const { editorState } = this.state;
-    this.setEditorState(RichUtils.toggleInlineStyle(editorState, inlineStyle));
+    this.setEditorState(EdisonUtil.toggleInlineStyle(editorState, inlineStyle));
   };
 
   private setDefaultValue = (html: string) => {
