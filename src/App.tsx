@@ -247,32 +247,7 @@ class App extends React.Component<any, State> {
     // toggleInlineStyle mean that content is changed
     this.checkContentIsChange();
     const { editorState } = this.state;
-
-    // check if fontSize exist already
-    if (inlineStyle.includes("fontsize-")) {
-      let updatedEditorState = editorState;
-      for (const item of editorState
-        .getCurrentInlineStyle()
-        .valueSeq()
-        .toArray()) {
-        if (item?.includes("fontsize-")) {
-          // toggle off
-          updatedEditorState = RichUtils.toggleInlineStyle(
-            updatedEditorState,
-            item
-          );
-        }
-      }
-      updatedEditorState = RichUtils.toggleInlineStyle(
-        updatedEditorState,
-        inlineStyle
-      );
-      this.setEditorState(updatedEditorState);
-    } else {
-      this.setEditorState(
-        RichUtils.toggleInlineStyle(editorState, inlineStyle)
-      );
-    }
+    this.setEditorState(EdisonUtil.toggleInlineStyle(editorState, inlineStyle));
   };
 
   private setDefaultValue = (html: string) => {
