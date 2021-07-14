@@ -174,31 +174,37 @@ class RNDraftView extends Component<PropTypes, DraftViewState> {
     }
   };
 
-  private executeScript = (
-    functionName: typeof InjectScriptName[keyof typeof InjectScriptName],
-    parameter?: string
-  ) => {
-    if (!this.webViewRef.current) {
-      return;
-    }
-    const timeout = this.timeoutMap.get(functionName);
+  private doSomethingAfterMounted = (id: string, func: () => void) => {
+    const timeout = this.timeoutMap.get(id);
     if (timeout) {
       clearTimeout(timeout);
     }
     if (!this.webviewMounted) {
       this.timeoutMap.set(
-        functionName,
+        id,
         setTimeout(() => {
-          this.executeScript(functionName, parameter);
+          this.doSomethingAfterMounted(id, func);
         }, 100)
       );
       return;
     }
-    this.webViewRef.current.injectJavaScript(
-      `window.${functionName} && window.${functionName}(${
-        parameter ? `'${parameter}'` : ""
-      });true;`
-    );
+    func();
+  };
+
+  private executeScript = (
+    functionName: typeof InjectScriptName[keyof typeof InjectScriptName],
+    parameter?: string
+  ) => {
+    this.doSomethingAfterMounted(`executeScript-${functionName}`, () => {
+      if (!this.webViewRef.current) {
+        return;
+      }
+      this.webViewRef.current.injectJavaScript(
+        `window.${functionName} && window.${functionName}(${
+          parameter ? `'${parameter}'` : ""
+        });true;`
+      );
+    });
   };
 
   private onMessage = (event: WebViewMessageEvent) => {
@@ -326,14 +332,15 @@ class RNDraftView extends Component<PropTypes, DraftViewState> {
   };
 
   focus = () => {
-    // android10 has bug for requestFocus
-    if (Platform.OS === "android" && Platform.Version !== 29) {
-      // focus the textinput to wake up the keyborad
-      this.textInputRef.current?.focus();
-      // android must focus webview first
-      this.webViewRef.current?.requestFocus();
-    }
-    this.executeScript(InjectScriptName.FocusTextEditor);
+    this.doSomethingAfterMounted(`focusAndShowKeyboard`, () => {
+      if (Platform.OS === "android") {
+        // focus the textinput to wake up the keyborad
+        this.textInputRef.current?.focus();
+        // android must focus webview first
+        this.webViewRef.current?.requestFocus();
+      }
+      this.executeScript(InjectScriptName.FocusTextEditor);
+    });
   };
 
   blur = () => {
